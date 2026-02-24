@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qui se présente? 🎉</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #3B82F6;
+    --blue-dark: #1D4ED8;
+    --yellow: #FCD34D;
+    --yellow-dark: #F59E0B;
+    --green: #10B981;
+    --red: #EF4444;
+    --bg: #EFF6FF;
+    --card: #FFFFFF;
+    --text: #1E3A5F;
+    --text-light: #64748B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    background-image: 
+      radial-gradient(circle at 10% 20%, #DBEAFE 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, #FEF3C7 0%, transparent 50%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: var(--text);
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  header h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: clamp(1.8rem, 5vw, 2.8rem);
+    font-weight: 800;
+    color: var(--blue-dark);
+    line-height: 1.1;
+  }
+
+  header p {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin-top: 6px;
+  }
+
+  /* Score bar */
+  .score-bar {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .score-pill {
+    background: var(--card);
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .score-pill span { font-size: 1.3rem; }
+
+  /* Progress */
+  .progress-wrap {
+    width: 100%;
+    max-width: 520px;
+    background: #DBEAFE;
+    border-radius: 50px;
+    height: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--blue), var(--blue-dark));
+    border-radius: 50px;
+    transition: width 0.5s ease;
+  }
+
+  /* Question card */
+  .card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 32px 28px;
+    max-width: 540px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(59,130,246,0.12);
+    margin-bottom: 20px;
+  }
+
+  /* Character + bubble */
+  .scene {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .avatar {
+    font-size: 4rem;
+    line-height: 1;
+    flex-shrink: 0;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .bubble {
+    background: var(--bg);
+    border: 2.5px solid var(--blue);
+    border-radius: 18px 18px 18px 4px;
+    padding: 16px 20px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+    position: relative;
+    flex: 1;
+  }
+
+  .blank {
+    display: inline-block;
+    min-width: 90px;
+    border-bottom: 3px solid var(--blue-dark);
+    color: var(--blue-dark);
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .question-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  /* Options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-btn {
+    background: var(--bg);
+    border: 2.5px solid #BFDBFE;
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    background: #DBEAFE;
+    border-color: var(--blue);
+    transform: translateX(4px);
+  }
+
+  .option-btn .letter {
+    background: var(--blue);
+    color: white;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .option-btn.correct {
+    background: #D1FAE5;
+    border-color: var(--green);
+    color: #065F46;
+  }
+
+  .option-btn.correct .letter { background: var(--green); }
+
+  .option-btn.wrong {
+    background: #FEE2E2;
+    border-color: var(--red);
+    color: #991B1B;
+  }
+
+  .option-btn.wrong .letter { background: var(--red); }
+
+  .option-btn:disabled { cursor: default; }
+
+  /* Feedback */
+  .feedback {
+    display: none;
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 16px;
+    animation: pop 0.3s ease;
+  }
+
+  @keyframes pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .feedback.good {
+    background: #D1FAE5;
+    color: #065F46;
+    display: block;
+  }
+
+  .feedback.bad {
+    background: #FEE2E2;
+    color: #991B1B;
+    display: block;
+  }
+
+  /* Next button */
+  .next-btn {
+    display: none;
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 32px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 16px;
+    width: 100%;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 12px rgba(59,130,246,0.35);
+  }
+
+  .next-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59,130,246,0.45);
+  }
+
+  .next-btn.visible { display: block; }
+
+  /* Model phrase */
+  .model-box {
+    background: var(--yellow);
+    border-radius: 14px;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #78350F;
+    margin-bottom: 20px;
+    text-align: center;
+    max-width: 540px;
+    width: 100%;
+  }
+
+  .model-box strong { font-size: 1.05rem; }
+
+  /* Final screen */
+  #final-screen {
+    display: none;
+    text-align: center;
+    max-width: 540px;
+    width: 100%;
+  }
+
+  .final-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 40px 32px;
+    box-shadow: 0 8px 32px rgba(59,130,246,0.12);
+  }
+
+  .final-emoji { font-size: 5rem; margin-bottom: 16px; }
+
+  .final-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--blue-dark);
+    margin-bottom: 8px;
+  }
+
+  .final-score {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--green);
+    margin: 16px 0;
+  }
+
+  .final-msg {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 24px;
+  }
+
+  .restart-btn {
+    background: linear-gradient(135deg, var(--yellow), var(--yellow-dark));
+    color: #78350F;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 32px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  .restart-btn:hover { transform: scale(1.05); }
+
+  /* Stars */
+  .stars { font-size: 2rem; margin: 8px 0; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎉 Qui se présente?</h1>
+  <p>Choisis la bonne réponse!</p>
+</header>
+
+<div class="model-box">
+  📌 Phrase modèle : <strong>Je m'appelle ___. &nbsp;|&nbsp; J'ai ___ ans.</strong>
+</div>
+
+<div class="score-bar">
+  <div class="score-pill"><span>⭐</span> Score : <strong id="score-display">0</strong></div>
+  <div class="score-pill"><span>❓</span> Question : <strong id="q-num">1</strong> / <strong id="q-total">8</strong></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+</div>
+
+<!-- Game area -->
+<div id="game-area">
+  <div class="card">
+    <div class="scene">
+      <div class="avatar" id="avatar">🧒</div>
+      <div class="bubble" id="bubble-text">...</div>
+    </div>
+    <div class="question-label">👇 Choisis la bonne réponse :</div>
+    <div class="options" id="options-container"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Suivant ➡️</button>
+  </div>
+</div>
+
+<!-- Final screen -->
+<div id="final-screen">
+  <div class="final-card">
+    <div class="final-emoji" id="final-emoji">🏆</div>
+    <div class="final-title">Excellent travail!</div>
+    <div class="stars" id="stars-display"></div>
+    <div class="final-score" id="final-score-display">0 / 8</div>
+    <div class="final-msg" id="final-msg">Tu peux te présenter en français!</div>
+    <button class="restart-btn" onclick="restartGame()">🔄 Rejouer</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    avatar: "🧒",
+    bubble: (ans) => `"___, je m'appelle Lucas."`,
+    blankWord: "Bonjour",
+    options: ["Bonjour", "Au revoir", "Merci"],
+    answer: 0,
+    feedback_good: "✅ Bravo! Bonjour = Hello!",
+    feedback_bad: "❌ On dit BONJOUR pour commencer!"
+  },
+  {
+    avatar: "👧",
+    bubble: (ans) => `"Je ___ appelle Sofia."`,
+    blankWord: "m'",
+    options: ["m'", "te", "se"],
+    answer: 0,
+    feedback_good: "✅ Super! Je m'appelle = My name is!",
+    feedback_bad: "❌ On dit : Je M'APPELLE!"
+  },
+  {
+    avatar: "👦",
+    bubble: (ans) => `"J'ai dix ___."`,
+    blankWord: "ans",
+    options: ["ans", "amis", "frères"],
+    answer: 0,
+    feedback_good: "✅ Excellent! J'ai dix ANS = I am ten years old!",
+    feedback_bad: "❌ C'est ANS! J'ai dix ANS."
+  },
+  {
+    avatar: "👩",
+    bubble: (ans) => `"Je m'appelle Marie. ___ onze ans."`,
+    blankWord: "J'ai",
+    options: ["J'ai", "Tu as", "Il a"],
+    answer: 0,
+    feedback_good: "✅ Parfait! J'AI = I am (for age)!",
+    feedback_bad: "❌ Pour MOI, je dis J'AI!"
+  },
+  {
+    avatar: "🧑",
+    bubble: (ans) => `"Bonjour! Je m'___ Alex."`,
+    blankWord: "appelle",
+    options: ["appelle", "aime", "ai"],
+    answer: 0,
+    feedback_good: "✅ Très bien! Je m'APPELLE!",
+    feedback_bad: "❌ C'est APPELLE! Je m'appelle..."
+  },
+  {
+    avatar: "👧",
+    bubble: (ans) => `"J'ai ___ ans." (Emma a 12 ans)`,
+    blankWord: "douze",
+    options: ["dix", "douze", "quinze"],
+    answer: 1,
+    feedback_good: "✅ Bravo! DOUZE = 12!",
+    feedback_bad: "❌ Emma a DOUZE (12) ans!"
+  },
+  {
+    avatar: "👦",
+    bubble: (ans) => `"___ m'appelle Théo."`,
+    blankWord: "Je",
+    options: ["Il", "Je", "Tu"],
+    answer: 1,
+    feedback_good: "✅ Super! JE = I (moi, myself)!",
+    feedback_bad: "❌ Pour moi, c'est JE m'appelle!"
+  },
+  {
+    avatar: "🧒",
+    bubble: (ans) => `"Bonjour! Je m'appelle Léa. J'ai onze ___."`,
+    blankWord: "ans",
+    options: ["amis", "ans", "frères"],
+    answer: 1,
+    feedback_good: "✅ Magnifique! Tu connais les deux structures! 🎉",
+    feedback_bad: "❌ Pour l'âge, on dit ANS! J'ai onze ANS."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+const letters = ['A', 'B', 'C'];
+
+function loadQuestion() {
+  const q = questions[current];
+  answered = false;
+
+  document.getElementById('q-num').textContent = current + 1;
+  document.getElementById('q-total').textContent = questions.length;
+  document.getElementById('avatar').textContent = q.avatar;
+
+  // Build bubble with blank highlighted
+  const rawText = q.bubble(q.blankWord);
+  const highlighted = rawText.replace(q.blankWord, `<span class="blank">${q.blankWord}</span>`);
+  // Actually show blank as ___
+  const withBlank = rawText.replace(q.blankWord, `<span class="blank">___</span>`);
+  document.getElementById('bubble-text').innerHTML = withBlank;
+
+  // Options
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span> ${opt}`;
+    btn.onclick = () => checkAnswer(i, q);
+    container.appendChild(btn);
+  });
+
+  // Reset feedback
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.textContent = '';
+
+  document.getElementById('next-btn').classList.remove('visible');
+
+  // Update progress
+  const pct = (current / questions.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function checkAnswer(chosen, q) {
+  if (answered) return;
+  answered = true;
+
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedback');
+
+  if (chosen === q.answer) {
+    score++;
+    document.getElementById('score-display').textContent = score;
+    btns[chosen].classList.add('correct');
+    fb.className = 'feedback good';
+    fb.textContent = q.feedback_good;
+  } else {
+    btns[chosen].classList.add('wrong');
+    btns[q.answer].classList.add('correct');
+    fb.className = 'feedback bad';
+    fb.textContent = q.feedback_bad;
+  }
+
+  document.getElementById('next-btn').classList.add('visible');
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showFinal();
+  } else {
+    loadQuestion();
+  }
+}
+
+function showFinal() {
+  document.getElementById('game-area').style.display = 'none';
+  document.getElementById('final-screen').style.display = 'block';
+
+  const total = questions.length;
+  const pct = score / total;
+
+  document.getElementById('final-score-display').textContent = `${score} / ${total}`;
+  document.getElementById('progress-bar').style.width = '100%';
+
+  let emoji, stars, msg;
+  if (pct >= 0.875) {
+    emoji = '🏆'; stars = '⭐⭐⭐'; msg = 'Tu es une superstar du français! Magnifique!';
+  } else if (pct >= 0.625) {
+    emoji = '🎉'; stars = '⭐⭐'; msg = 'Très bon travail! Continue comme ça!';
+  } else {
+    emoji = '💪'; stars = '⭐'; msg = 'Bonne tentative! Essaie encore, tu vas réussir!';
+  }
+
+  document.getElementById('final-emoji').textContent = emoji;
+  document.getElementById('stars-display').textContent = stars;
+  document.getElementById('final-msg').textContent = msg;
+}
+
+function restartGame() {
+  current = 0;
+  score = 0;
+  answered = false;
+  document.getElementById('score-display').textContent = 0;
+  document.getElementById('game-area').style.display = 'block';
+  document.getElementById('final-screen').style.display = 'none';
+  loadQuestion();
+}
+
+// Start
+loadQuestion();
+</script>
+</body>
+</html>
