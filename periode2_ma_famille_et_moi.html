@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ma famille et moi 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --pink: #EC4899;
+    --yellow: #FCD34D;
+    --green: #10B981;
+    --red: #EF4444;
+    --bg: #F5F3FF;
+    --white: #FFFFFF;
+    --dark: #1E1B4B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    overflow-x: hidden;
+  }
+
+  /* Confetti decorations */
+  .confetti-bar {
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 6px;
+    letter-spacing: 4px;
+  }
+
+  /* Stars floating */
+  .star {
+    position: fixed;
+    font-size: 1.4rem;
+    opacity: 0.18;
+    animation: floatStar 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes floatStar {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(15deg); }
+  }
+
+  /* Header */
+  header {
+    width: 100%;
+    max-width: 600px;
+    background: var(--purple);
+    border-radius: 24px;
+    padding: 18px 24px 14px;
+    text-align: center;
+    margin-bottom: 14px;
+    box-shadow: 0 6px 20px rgba(124,58,237,0.35);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: "⭐ ✨ ⭐ ✨ ⭐ ✨ ⭐";
+    position: absolute;
+    top: 6px; left: 0; right: 0;
+    font-size: 0.8rem;
+    opacity: 0.4;
+    letter-spacing: 2px;
+  }
+  header h1 {
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    font-weight: 900;
+    color: var(--yellow);
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+    margin-top: 10px;
+  }
+  header p {
+    color: rgba(255,255,255,0.85);
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  /* Score + progress */
+  .hud {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .hud-pill {
+    flex: 1;
+    background: var(--white);
+    border-radius: 50px;
+    padding: 10px 16px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--dark);
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .hud-pill .emoji { font-size: 1.3rem; }
+
+  .progress-wrap {
+    width: 100%;
+    max-width: 600px;
+    background: var(--purple-light);
+    border-radius: 50px;
+    height: 14px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    border-radius: 50px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* MODEL phrase - always visible */
+  .model-box {
+    width: 100%;
+    max-width: 600px;
+    background: var(--yellow);
+    border-radius: 18px;
+    padding: 12px 20px;
+    margin-bottom: 14px;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--dark);
+    box-shadow: 0 3px 10px rgba(252,211,77,0.4);
+  }
+
+  /* Question card */
+  .card {
+    width: 100%;
+    max-width: 600px;
+    background: var(--white);
+    border-radius: 24px;
+    padding: 24px 20px;
+    box-shadow: 0 8px 28px rgba(124,58,237,0.13);
+    margin-bottom: 14px;
+  }
+
+  /* Character scene */
+  .scene {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .avatar {
+    font-size: 3.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+    animation: wobble 3s ease-in-out infinite;
+  }
+  @keyframes wobble {
+    0%,100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+  .bubble {
+    background: var(--purple-light);
+    border: 3px solid var(--purple);
+    border-radius: 18px 18px 18px 4px;
+    padding: 14px 18px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--dark);
+    line-height: 1.5;
+    flex: 1;
+  }
+  .blank {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 3px solid var(--purple);
+    color: var(--purple);
+    text-align: center;
+  }
+
+  .q-label {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--purple);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+  }
+
+  /* Options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .opt-btn {
+    background: var(--bg);
+    border: 3px solid var(--purple-light);
+    border-radius: 16px;
+    padding: 14px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--dark);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.15s ease;
+    text-align: left;
+  }
+  .opt-btn:hover:not(:disabled) {
+    background: var(--purple-light);
+    border-color: var(--purple);
+    transform: translateX(5px);
+  }
+  .opt-letter {
+    background: var(--purple);
+    color: var(--white);
+    border-radius: 10px;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .opt-btn.correct { background: #D1FAE5; border-color: var(--green); }
+  .opt-btn.correct .opt-letter { background: var(--green); }
+  .opt-btn.wrong { background: #FEE2E2; border-color: var(--red); }
+  .opt-btn.wrong .opt-letter { background: var(--red); }
+  .opt-btn:disabled { cursor: default; }
+
+  /* Feedback */
+  .feedback {
+    display: none;
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 14px;
+    animation: popIn 0.3s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .feedback.good { display: block; background: #D1FAE5; color: #065F46; }
+  .feedback.bad  { display: block; background: #FEE2E2; color: #991B1B; }
+
+  .next-btn {
+    display: none;
+    width: 100%;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    color: var(--white);
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 900;
+    cursor: pointer;
+    margin-top: 12px;
+    box-shadow: 0 5px 15px rgba(124,58,237,0.4);
+    transition: transform 0.15s ease;
+  }
+  .next-btn:hover { transform: scale(1.02); }
+  .next-btn.show { display: block; }
+
+  /* Stars animation on correct */
+  .star-burst {
+    position: fixed;
+    font-size: 2rem;
+    pointer-events: none;
+    animation: burst 1s ease-out forwards;
+    z-index: 999;
+  }
+  @keyframes burst {
+    0%   { transform: translate(0,0) scale(0); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(1.5); opacity: 0; }
+  }
+
+  /* Final screen */
+  #final {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+  }
+  .final-card {
+    background: var(--white);
+    border-radius: 28px;
+    padding: 40px 28px;
+    box-shadow: 0 10px 40px rgba(124,58,237,0.18);
+  }
+  .final-trophy { font-size: 5rem; margin-bottom: 10px; }
+  .final-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--purple);
+    margin-bottom: 8px;
+  }
+  .final-stars { font-size: 2.4rem; margin: 10px 0; }
+  .final-score {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--pink);
+    margin: 10px 0;
+  }
+  .final-msg {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #6B7280;
+    margin-bottom: 24px;
+  }
+  .replay-btn {
+    background: linear-gradient(135deg, var(--yellow), #F59E0B);
+    color: var(--dark);
+    border: none;
+    border-radius: 16px;
+    padding: 16px 36px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(252,211,77,0.5);
+    transition: transform 0.15s ease;
+  }
+  .replay-btn:hover { transform: scale(1.05); }
+</style>
+</head>
+<body>
+
+<!-- Floating stars background -->
+<div class="star" style="top:8%;left:5%;animation-delay:0s">⭐</div>
+<div class="star" style="top:15%;right:8%;animation-delay:1s">✨</div>
+<div class="star" style="top:60%;left:3%;animation-delay:2s">🌟</div>
+<div class="star" style="top:75%;right:5%;animation-delay:0.5s">⭐</div>
+<div class="star" style="top:40%;right:2%;animation-delay:1.5s">✨</div>
+
+<div class="confetti-bar">🎊 ⭐ 🎉 ⭐ 🎊 ⭐ 🎉</div>
+
+<header>
+  <h1>🌟 Ma famille et moi!</h1>
+  <p>Choisis la bonne réponse!</p>
+</header>
+
+<div class="hud">
+  <div class="hud-pill"><span class="emoji">⭐</span> Score : <strong id="score">0</strong></div>
+  <div class="hud-pill"><span class="emoji">❓</span> <strong id="qnum">1</strong> / <strong id="qtot">10</strong></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-fill" id="prog" style="width:0%"></div>
+</div>
+
+<div class="model-box">
+  📌 Je m'appelle ___.  •  J'ai ___ ans.  •  Dans ma famille, j'ai ___.  •  Il/Elle est ___.
+</div>
+
+<div id="game">
+  <div class="card">
+    <div class="scene">
+      <div class="avatar" id="avatar">🧒</div>
+      <div class="bubble" id="bubble">...</div>
+    </div>
+    <div class="q-label">👇 Choisis la bonne réponse :</div>
+    <div class="options" id="opts"></div>
+    <div class="feedback" id="fb"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQ()">Suivant ➡️</button>
+  </div>
+</div>
+
+<div id="final">
+  <div class="final-card">
+    <div class="final-trophy" id="ftrophy">🏆</div>
+    <div class="final-title">Bravo!</div>
+    <div class="final-stars" id="fstars">⭐⭐⭐</div>
+    <div class="final-score" id="fscore">0/10</div>
+    <div class="final-msg" id="fmsg">Tu connais ta famille en français!</div>
+    <button class="replay-btn" onclick="restart()">🔄 Rejouer!</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  // ── BLOC 1 : Révision Je m'appelle / J'ai ___ ans ──────────
+  {
+    avatar: "👧",
+    bubble: "« Bonjour! Je ___ appelle Emma. »",
+    blank: "m'",
+    opts: ["m'", "te", "se"],
+    ans: 0,
+    good: "✅ Bravo! Je M'APPELLE! Super!",
+    bad:  "❌ C'est M'! Je M'appelle!"
+  },
+  {
+    avatar: "👦",
+    bubble: "« J'ai onze ___. »",
+    blank: "ans",
+    opts: ["amis", "ans", "frères"],
+    ans: 1,
+    good: "✅ Excellent! J'ai onze ANS!",
+    bad:  "❌ Pour l'âge, on dit ANS!"
+  },
+  // ── BLOC 2 : Dans ma famille, j'ai ────────────────────────
+  {
+    avatar: "🧒",
+    bubble: "« Dans ma famille, ___ a un frère. »",
+    blank: "j'",
+    opts: ["il", "j'", "elle"],
+    ans: 1,
+    good: "✅ Super! Dans ma famille, J'AI!",
+    bad:  "❌ Pour MOI, c'est J'AI!"
+  },
+  {
+    avatar: "👩",
+    bubble: "« Dans ma famille, j'ai une ___. » (sœur)",
+    blank: "sœur",
+    opts: ["frère", "père", "sœur"],
+    ans: 2,
+    good: "✅ Parfait! Une SŒUR = a sister!",
+    bad:  "❌ Une SŒUR = a sister! Essaie encore!"
+  },
+  {
+    avatar: "🧑",
+    bubble: "« Dans ma famille, j'ai un grand-___. »",
+    blank: "père",
+    opts: ["mère", "père", "oncle"],
+    ans: 1,
+    good: "✅ Bravo! Un grand-PÈRE = grandfather!",
+    bad:  "❌ Grand-PÈRE = grandfather!"
+  },
+  // ── BLOC 3 : Il est / Elle est ────────────────────────────
+  {
+    avatar: "👧",
+    bubble: "« Mon frère ___ grand. »",
+    blank: "est",
+    opts: ["a", "est", "ont"],
+    ans: 1,
+    good: "✅ Excellent! Il EST grand!",
+    bad:  "❌ On dit EST! Il EST grand!"
+  },
+  {
+    avatar: "🧒",
+    bubble: "« Ma sœur est ___. » (petite)",
+    blank: "petite",
+    opts: ["petit", "petite", "grand"],
+    ans: 1,
+    good: "✅ Super! Ma sœur est PETITE! (féminin!)",
+    bad:  "❌ Ma SŒUR = féminin → PETITE!"
+  },
+  {
+    avatar: "👦",
+    bubble: "« Mon oncle est ___. » (funny / drôle)",
+    blank: "drôle",
+    opts: ["drôle", "grande", "petite"],
+    ans: 0,
+    good: "✅ Bravo! DRÔLE = funny!",
+    bad:  "❌ DRÔLE = funny! Essaie encore!"
+  },
+  // ── BLOC 4 : Combinaison ──────────────────────────────────
+  {
+    avatar: "👩",
+    bubble: "« Dans ma famille, j'ai une tante. Elle ___ gentille. »",
+    blank: "est",
+    opts: ["a", "est", "ai"],
+    ans: 1,
+    good: "✅ Parfait! Elle EST gentille!",
+    bad:  "❌ Elle EST gentille! (is = EST)"
+  },
+  {
+    avatar: "🧒",
+    bubble: "« Dans ma famille, j'ai un ___. Il est grand. »",
+    blank: "père",
+    opts: ["mère", "tante", "père"],
+    ans: 2,
+    good: "✅ Magnifique! UN PÈRE = a father! 🎉",
+    bad:  "❌ UN PÈRE = a father! (masculin)"
+  },
+];
+
+let cur = 0, score = 0, answered = false;
+const LETTERS = ['A','B','C'];
+
+function loadQ() {
+  answered = false;
+  const q = questions[cur];
+  document.getElementById('qnum').textContent = cur + 1;
+  document.getElementById('qtot').textContent = questions.length;
+  document.getElementById('prog').style.width = (cur / questions.length * 100) + '%';
+  document.getElementById('avatar').textContent = q.avatar;
+
+  // Build bubble with blank
+  const bubbleText = q.bubble.replace(q.blank, `<span class="blank">___</span>`);
+  document.getElementById('bubble').innerHTML = bubbleText;
+
+  // Build options
+  const optsEl = document.getElementById('opts');
+  optsEl.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-letter">${LETTERS[i]}</span>${opt}`;
+    btn.onclick = () => checkAns(i);
+    optsEl.appendChild(btn);
+  });
+
+  // Reset
+  const fb = document.getElementById('fb');
+  fb.className = 'feedback';
+  fb.textContent = '';
+  document.getElementById('nextBtn').classList.remove('show');
+}
+
+function checkAns(chosen) {
+  if (answered) return;
+  answered = true;
+  const q = questions[cur];
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('fb');
+
+  if (chosen === q.ans) {
+    score++;
+    document.getElementById('score').textContent = score;
+    btns[chosen].classList.add('correct');
+    fb.className = 'feedback good';
+    fb.textContent = q.good;
+    spawnStars();
+  } else {
+    btns[chosen].classList.add('wrong');
+    btns[q.ans].classList.add('correct');
+    fb.className = 'feedback bad';
+    fb.textContent = q.bad;
+  }
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function spawnStars() {
+  ['⭐','✨','🌟'].forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'star-burst';
+    el.textContent = s;
+    const angle = (i * 120 + Math.random() * 40) * Math.PI / 180;
+    const dist = 80 + Math.random() * 60;
+    el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+    el.style.setProperty('--dy', Math.sin(angle) * dist - 60 + 'px');
+    el.style.left = (40 + Math.random() * 60) + '%';
+    el.style.top = '50%';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  });
+}
+
+function nextQ() {
+  cur++;
+  if (cur >= questions.length) showFinal();
+  else loadQ();
+}
+
+function showFinal() {
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('final').style.display = 'block';
+  document.getElementById('prog').style.width = '100%';
+  const pct = score / questions.length;
+  document.getElementById('fscore').textContent = `${score} / ${questions.length}`;
+  let trophy, stars, msg;
+  if (pct >= 0.9)       { trophy='🏆'; stars='⭐⭐⭐'; msg='Tu es une SUPERSTAR du français! Incroyable!'; }
+  else if (pct >= 0.7)  { trophy='🎉'; stars='⭐⭐'; msg='Très bien! Tu connais bien ta famille!'; }
+  else                  { trophy='💪'; stars='⭐'; msg='Bonne tentative! Continue à pratiquer!'; }
+  document.getElementById('ftrophy').textContent = trophy;
+  document.getElementById('fstars').textContent = stars;
+  document.getElementById('fmsg').textContent = msg;
+}
+
+function restart() {
+  cur = 0; score = 0; answered = false;
+  document.getElementById('score').textContent = 0;
+  document.getElementById('game').style.display = 'block';
+  document.getElementById('final').style.display = 'none';
+  loadQ();
+}
+
+loadQ();
+</script>
+</body>
+</html>
