@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎒 L'Excursion en Famille — Tableau de Bord</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1a6fb5;
+    --blue-dark: #0d4a85;
+    --blue-light: #e8f4fd;
+    --orange: #f07d1a;
+    --orange-light: #fff3e0;
+    --green: #2e9b5e;
+    --green-light: #e8f8ef;
+    --purple: #7c3aed;
+    --purple-light: #f3eeff;
+    --yellow: #f5c518;
+    --red: #e03c3c;
+    --white: #ffffff;
+    --bg: #f0f6ff;
+    --card: #ffffff;
+    --text: #1a2340;
+    --shadow: 0 8px 32px rgba(26,111,181,0.13);
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ===== TOP NAV ===== */
+  .top-nav {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 100%);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(13,74,133,0.35);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .nav-tab {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.25);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-tab:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
+  .nav-tab.active { background: white; color: var(--blue-dark); border-color: white; }
+
+  /* ===== PANELS ===== */
+  .panel { display: none; padding: 28px; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== HOME PANEL ===== */
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .home-hero {
+    text-align: center;
+    padding: 32px 20px 24px;
+    max-width: 700px;
+    margin: 0 auto 32px;
+  }
+  .home-hero h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--blue-dark);
+    line-height: 1.2;
+  }
+  .home-hero p { color: #556; font-size: 1.1rem; margin-top: 10px; }
+  .game-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 22px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .game-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--accent, var(--blue));
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .game-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(26,111,181,0.2); border-color: var(--accent, var(--blue)); }
+  .game-card .icon { font-size: 3.2rem; margin-bottom: 12px; }
+  .game-card h3 { font-family: 'Baloo 2', cursive; font-size: 1.2rem; color: var(--blue-dark); margin-bottom: 6px; }
+  .game-card p { font-size: 0.85rem; color: #778; line-height: 1.4; }
+  .game-card .lesson-tag {
+    display: inline-block;
+    background: var(--accent-light, var(--blue-light));
+    color: var(--accent, var(--blue));
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 3px solid var(--blue-light);
+  }
+  .section-header .icon { font-size: 2rem; }
+  .section-header h2 { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: var(--blue-dark); }
+  .section-header p { color: #667; font-size: 0.95rem; }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,111,181,0.35); }
+  .btn-orange { background: var(--orange); color: white; }
+  .btn-orange:hover { background: #d96b0a; transform: translateY(-2px); }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #237a4a; transform: translateY(-2px); }
+  .btn-outline { background: white; color: var(--blue); border: 2px solid var(--blue); }
+  .btn-outline:hover { background: var(--blue-light); }
+  .btn-sm { padding: 8px 16px; font-size: 0.875rem; }
+
+  /* ===== ROUE DES NOMS ===== */
+  .wheel-container {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .wheel-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .canvas-wrap {
+    position: relative;
+    width: 360px; height: 360px;
+  }
+  #wheelCanvas { border-radius: 50%; }
+  .wheel-pointer {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 22px; height: 22px;
+    background: white;
+    border-radius: 50%;
+    border: 4px solid #333;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .wheel-arrow {
+    position: absolute;
+    top: -18px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    z-index: 10;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  .winner-banner {
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    color: white;
+    padding: 14px 28px;
+    border-radius: var(--radius);
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: var(--shadow);
+    min-height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%;
+    transition: all 0.4s;
+  }
+  .wheel-sidebar {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .wheel-sidebar h3 { font-family: 'Baloo 2', cursive; color: var(--blue-dark); margin-bottom: 16px; font-size: 1.2rem; }
+  .names-list {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 16px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .name-chip {
+    background: var(--blue-light);
+    color: var(--blue-dark);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .name-chip .remove { cursor: pointer; color: var(--red); font-size: 1rem; }
+  .name-chip.absent { background: #ffeeee; color: #999; text-decoration: line-through; }
+  .add-name-row { display: flex; gap: 8px; margin-top: 12px; }
+  .name-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 2px solid #dde;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .name-input:focus { outline: none; border-color: var(--blue); }
+
+  /* ===== DRAG & DROP ===== */
+  .dnd-scene {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .dnd-toolbar {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 24px; align-items: center;
+  }
+  .level-btn {
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 2px solid var(--blue);
+    background: white;
+    color: var(--blue);
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+  .level-btn.active { background: var(--blue); color: white; }
+  .dnd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .dnd-sources {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .dnd-targets {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .drag-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--blue-light);
+    border: 3px solid var(--blue);
+    border-radius: 14px;
+    padding: 12px 16px;
+    cursor: grab;
+    transition: all 0.2s;
+    user-select: none;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  .drag-item:active { cursor: grabbing; opacity: 0.7; }
+  .drag-item.dragging { opacity: 0.4; }
+  .drag-item .item-emoji { font-size: 1.8rem; }
+  .drop-zone {
+    background: white;
+    border: 3px dashed #bcd;
+    border-radius: 14px;
+    padding: 14px 16px;
+    min-height: 80px;
+    transition: all 0.2s;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .drop-zone.dragover { background: var(--blue-light); border-color: var(--blue); border-style: solid; }
+  .drop-zone.correct { border-color: var(--green); background: var(--green-light); }
+  .drop-zone.wrong { border-color: var(--red); background: #ffeeee; }
+  .drop-zone-label {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--blue-dark);
+  }
+  .drop-zone-label .big-emoji { font-size: 2rem; }
+  .dropped-item {
+    background: var(--blue-light);
+    border: 2px solid var(--blue);
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+    justify-content: space-between;
+  }
+  .dropped-item.correct { background: var(--green-light); border-color: var(--green); }
+  .dropped-item.wrong { background: #ffeeee; border-color: var(--red); }
+  .dropped-item .undo-btn { cursor: pointer; color: #999; font-size: 1rem; }
+  .score-bar {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .score-display { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: var(--blue-dark); }
+  .stars { font-size: 1.5rem; }
+
+  /* ===== QUIZ ===== */
+  .quiz-scene { max-width: 860px; margin: 0 auto; }
+  .quiz-header-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: white; border-radius: var(--radius);
+    padding: 16px 24px; margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  .quiz-progress { font-family: 'Baloo 2', cursive; color: var(--blue-dark); font-size: 1.1rem; }
+  .timer-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: conic-gradient(var(--orange) calc(var(--p, 100) * 1%), #eee 0);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--blue-dark);
+    position: relative;
+  }
+  .timer-inner {
+    width: 44px; height: 44px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--blue-dark);
+  }
+  .quiz-question {
+    background: white; border-radius: var(--radius);
+    padding: 32px; text-align: center;
+    margin-bottom: 24px; box-shadow: var(--shadow);
+  }
+  .quiz-question .q-emoji { font-size: 4rem; margin-bottom: 12px; }
+  .quiz-question h2 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.7rem; color: var(--blue-dark);
+  }
+  .quiz-question .q-structure {
+    display: inline-block; background: var(--blue-light);
+    color: var(--blue); font-weight: 700;
+    padding: 6px 16px; border-radius: 20px;
+    margin-top: 8px; font-size: 0.95rem;
+  }
+  .quiz-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .quiz-choice {
+    background: white; border: 3px solid #dde;
+    border-radius: 16px; padding: 18px;
+    cursor: pointer; transition: all 0.2s;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .quiz-choice .c-emoji { font-size: 2.4rem; }
+  .quiz-choice:hover { border-color: var(--blue); background: var(--blue-light); transform: translateY(-2px); }
+  .quiz-choice.selected-correct { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .quiz-choice.selected-wrong { border-color: var(--red); background: #ffeeee; color: var(--red); }
+  .quiz-choice.reveal-correct { border-color: var(--green); background: var(--green-light); animation: pulse-green 0.5s ease; }
+  @keyframes pulse-green { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+  .quiz-feedback {
+    text-align: center; padding: 16px;
+    border-radius: var(--radius); font-family: 'Baloo 2', cursive;
+    font-size: 1.3rem; font-weight: 800;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; animation: fadeIn 0.3s ease; }
+  .quiz-feedback.correct { background: var(--green-light); color: var(--green); }
+  .quiz-feedback.wrong { background: #ffeeee; color: var(--red); }
+
+  /* ===== MEMORY ===== */
+  .memory-scene { max-width: 900px; margin: 0 auto; }
+  .memory-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .memory-stats { display: flex; gap: 20px; }
+  .memory-stat {
+    background: white; border-radius: 14px;
+    padding: 12px 20px; box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .memory-stat .stat-val { font-family: 'Baloo 2', cursive; font-size: 1.6rem; color: var(--blue-dark); }
+  .memory-stat .stat-lbl { font-size: 0.75rem; color: #889; font-weight: 700; text-transform: uppercase; }
+  .memory-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .memory-card {
+    aspect-ratio: 1;
+    cursor: pointer;
+    perspective: 600px;
+  }
+  .memory-card-inner {
+    width: 100%; height: 100%;
+    position: relative;
+    transition: transform 0.45s cubic-bezier(.4,.2,.2,1);
+    transform-style: preserve-3d;
+  }
+  .memory-card.flipped .memory-card-inner { transform: rotateY(180deg); }
+  .memory-card.matched .memory-card-inner { transform: rotateY(180deg); }
+  .memory-card-front, .memory-card-back {
+    position: absolute; width: 100%; height: 100%;
+    backface-visibility: hidden;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+  }
+  .memory-card-front {
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    border: 3px solid rgba(255,255,255,0.3);
+    color: white; font-size: 1.8rem;
+  }
+  .memory-card-back {
+    transform: rotateY(180deg);
+    background: white;
+    border: 3px solid var(--blue-light);
+    box-shadow: 0 4px 16px rgba(26,111,181,0.12);
+    flex-direction: column;
+    gap: 4px;
+    text-align: center; padding: 6px;
+  }
+  .memory-card.matched .memory-card-back {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+  .memory-card-back .card-word { font-size: 0.75rem; font-weight: 800; color: var(--blue-dark); line-height: 1.2; }
+  .memory-difficulty { display: flex; gap: 10px; margin-bottom: 16px; }
+
+  /* ===== WORD WHEEL (Roue de la fortune) ===== */
+  .wordwheel-scene { max-width: 900px; margin: 0 auto; }
+  .wordwheel-word {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    margin: 24px 0;
+  }
+  .letter-box {
+    width: 56px; height: 64px;
+    border-bottom: 4px solid var(--blue);
+    display: flex; align-items: flex-end; justify-content: center;
+    font-family: 'Baloo 2', cursive;
+    font-size: 2rem; font-weight: 800;
+    color: var(--blue-dark);
+    padding-bottom: 4px;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .letter-box.revealed { animation: popIn 0.3s ease; }
+  @keyframes popIn { 0%{transform:scale(0.5)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+  .letter-box.wrong-guess { background: #ffeeee; border-radius: 8px 8px 0 0; }
+  .keyboard {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .key-btn {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    border: 2px solid var(--blue);
+    background: white;
+    color: var(--blue-dark);
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .key-btn:hover { background: var(--blue-light); }
+  .key-btn.used-correct { background: var(--green); border-color: var(--green); color: white; }
+  .key-btn.used-wrong { background: #ddd; border-color: #ccc; color: #999; cursor: not-allowed; }
+  .hangman-display {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    font-size: 2.5rem;
+    margin: 12px 0;
+  }
+  .hangman-heart { transition: all 0.3s; }
+  .hangman-heart.lost { opacity: 0.2; filter: grayscale(1); }
+  .ww-hint {
+    background: var(--orange-light);
+    border: 2px solid var(--orange);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin: 16px 0;
+    font-weight: 700;
+    color: #7a4000;
+    display: flex; gap: 10px; align-items: center;
+    font-size: 1.05rem;
+  }
+  .ww-category {
+    background: var(--purple-light);
+    border: 2px solid var(--purple);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin: 8px 0;
+    font-weight: 700;
+    color: var(--purple);
+    display: flex; gap: 10px; align-items: center;
+  }
+  .ww-image {
+    font-size: 5rem; text-align: center;
+    margin: 16px 0;
+  }
+  .ww-end-banner {
+    text-align: center;
+    padding: 32px;
+    border-radius: var(--radius);
+    margin-top: 16px;
+    display: none;
+  }
+  .ww-end-banner.show { display: block; animation: fadeIn 0.5s ease; }
+  .ww-end-banner h2 { font-family: 'Baloo 2', cursive; font-size: 2rem; }
+
+  /* ===== CONFETTI ===== */
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #bcd; border-radius: 4px; }
+
+  @media(max-width: 700px) {
+    .wheel-container { grid-template-columns: 1fr; }
+    .dnd-grid { grid-template-columns: 1fr; }
+    .quiz-choices { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-title">🎒 L'Excursion en Famille</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPanel('home')">🏠 Accueil</button>
+    <button class="nav-tab" onclick="showPanel('wheel')">🎡 Roue des noms</button>
+    <button class="nav-tab" onclick="showPanel('dnd')">🌤️ Glisser-déposer</button>
+    <button class="nav-tab" onclick="showPanel('quiz')">⚡ Quiz</button>
+    <button class="nav-tab" onclick="showPanel('memory')">🧠 Mémoire</button>
+    <button class="nav-tab" onclick="showPanel('wordwheel')">🔤 Deviner le mot</button>
+  </div>
+</nav>
+
+<!-- ===== HOME ===== -->
+<div class="panel active" id="panel-home">
+  <div class="home-hero">
+    <h1>🎒 Tableau de bord numérique</h1>
+    <p>1re année — Extended French &nbsp;|&nbsp; Thème : Préférences, vêtements et nourriture</p>
+  </div>
+  <div class="home-grid">
+    <div class="game-card" style="--accent:#1a6fb5;--accent-light:#e8f4fd" onclick="showPanel('wheel')">
+      <div class="lesson-tag">Toutes les leçons</div>
+      <div class="icon">🎡</div>
+      <h3>Roue des noms</h3>
+      <p>Sélectionner un(e) élève au hasard pour répondre ou présenter</p>
+    </div>
+    <div class="game-card" style="--accent:#f07d1a;--accent-light:#fff3e0" onclick="showPanel('dnd')">
+      <div class="lesson-tag">Leçons 4 & 5</div>
+      <div class="icon">🌤️</div>
+      <h3>Vêtements & Météo</h3>
+      <p>Glisser-déposer les bons vêtements selon le temps qu'il fait</p>
+    </div>
+    <div class="game-card" style="--accent:#e03c3c;--accent-light:#ffeeee" onclick="showPanel('quiz')">
+      <div class="lesson-tag">Leçons 3, 4 & 6</div>
+      <div class="icon">⚡</div>
+      <h3>Quiz éclair</h3>
+      <p>Questions visuelles avec timer — nourriture, vêtements, activités</p>
+    </div>
+    <div class="game-card" style="--accent:#2e9b5e;--accent-light:#e8f8ef" onclick="showPanel('memory')">
+      <div class="lesson-tag">Leçons 1, 3 & 5</div>
+      <div class="icon">🧠</div>
+      <h3>Jeu de mémoire</h3>
+      <p>Associer l'image et le mot — nourriture, activités et équipement</p>
+    </div>
+    <div class="game-card" style="--accent:#7c3aed;--accent-light:#f3eeff" onclick="showPanel('wordwheel')">
+      <div class="lesson-tag">Toutes les leçons</div>
+      <div class="icon">🔤</div>
+      <h3>Deviner le mot</h3>
+      <p>Devine le mot caché grâce aux indices visuels — phonétique intégrée</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ROUE DES NOMS ===== -->
+<div class="panel" id="panel-wheel">
+  <div class="section-header">
+    <div class="icon">🎡</div>
+    <div>
+      <h2>Roue des noms</h2>
+      <p>Tourne la roue pour choisir un(e) élève !</p>
+    </div>
+  </div>
+  <div class="wheel-container">
+    <div class="wheel-wrap">
+      <div class="canvas-wrap">
+        <div class="wheel-arrow">▼</div>
+        <canvas id="wheelCanvas" width="360" height="360"></canvas>
+        <div class="wheel-pointer"></div>
+      </div>
+      <div class="winner-banner" id="winnerBanner">
+        🎯 Tourne la roue !
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <button class="btn btn-primary" onclick="spinWheel()">🎡 Tourner !</button>
+        <button class="btn btn-outline" onclick="markAbsent()">❌ Absent(e)</button>
+        <button class="btn btn-green" onclick="resetWheel()">🔄 Réinitialiser</button>
+      </div>
+    </div>
+    <div class="wheel-sidebar">
+      <h3>👥 Liste des élèves</h3>
+      <div class="names-list" id="namesList"></div>
+      <div class="add-name-row">
+        <input class="name-input" id="newNameInput" placeholder="Ajouter un nom..." onkeydown="if(event.key==='Enter')addName()">
+        <button class="btn btn-primary btn-sm" onclick="addName()">+</button>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="resetAbsent()">✅ Tous présents</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DRAG & DROP ===== -->
+<div class="panel" id="panel-dnd">
+  <div class="section-header">
+    <div class="icon">🌤️</div>
+    <div>
+      <h2>Vêtements & Météo</h2>
+      <p>Glisse le bon vêtement dans la bonne météo !</p>
+    </div>
+  </div>
+  <div class="dnd-scene">
+    <div class="score-bar">
+      <div class="score-display" id="dndScore">⭐ Score : 0 / 0</div>
+      <div class="stars" id="dndStars"></div>
+      <div style="display:flex;gap:10px">
+        <div class="dnd-toolbar" style="margin:0">
+          <button class="level-btn active" onclick="setDndLevel('hiver')">❄️ Hiver</button>
+          <button class="level-btn" onclick="setDndLevel('ete')">☀️ Été</button>
+          <button class="level-btn" onclick="setDndLevel('mixte')">🌈 Mixte</button>
+        </div>
+        <button class="btn btn-orange btn-sm" onclick="initDnd()">🔄 Nouveau</button>
+        <button class="btn btn-green btn-sm" onclick="checkDnd()">✅ Vérifier</button>
+      </div>
+    </div>
+    <div class="dnd-grid">
+      <div class="dnd-sources">
+        <h3 style="font-family:'Baloo 2',cursive;color:var(--blue-dark);margin-bottom:16px">👗 Vêtements à trier</h3>
+        <div id="dndItems"></div>
+      </div>
+      <div class="dnd-targets" id="dndTargets"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="panel" id="panel-quiz">
+  <div class="section-header">
+    <div class="icon">⚡</div>
+    <div>
+      <h2>Quiz éclair</h2>
+      <p>Réponds le plus vite possible !</p>
+    </div>
+  </div>
+  <div class="quiz-scene">
+    <div id="quizStart" style="text-align:center;padding:40px">
+      <div style="font-size:5rem;margin-bottom:16px">🎯</div>
+      <h2 style="font-family:'Baloo 2',cursive;font-size:2rem;color:var(--blue-dark);margin-bottom:12px">Prêt pour le quiz ?</h2>
+      <p style="color:#667;margin-bottom:28px">10 questions sur la nourriture, les vêtements et les activités</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="startQuiz('nourriture')">🍎 Nourriture</button>
+        <button class="btn btn-orange" onclick="startQuiz('vetements')">🧥 Vêtements</button>
+        <button class="btn btn-green" onclick="startQuiz('activites')">⛺ Activités</button>
+        <button class="btn btn-outline" onclick="startQuiz('mixte')">🌈 Tout !</button>
+      </div>
+    </div>
+    <div id="quizGame" style="display:none">
+      <div class="quiz-header-bar">
+        <div class="quiz-progress" id="quizProgress">Question 1 / 10</div>
+        <div id="quizScoreDisplay" style="font-family:'Baloo 2',cursive;font-size:1.2rem;color:var(--green)">✅ 0</div>
+        <div class="timer-circle">
+          <div class="timer-inner" id="timerDisplay">10</div>
+        </div>
+      </div>
+      <div class="quiz-question" id="quizQuestion">
+        <div class="q-emoji" id="quizEmoji">🍎</div>
+        <h2 id="quizQText">Qu'est-ce que c'est ?</h2>
+        <div class="q-structure" id="quizStructure"></div>
+      </div>
+      <div class="quiz-choices" id="quizChoices"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="btn btn-outline btn-sm" onclick="showPanel('quiz');document.getElementById('quizStart').style.display='block';document.getElementById('quizGame').style.display='none'">🔙 Quitter</button>
+      </div>
+    </div>
+    <div id="quizEnd" style="display:none;text-align:center;padding:40px">
+      <div style="font-size:5rem;margin-bottom:12px" id="quizEndEmoji">🎉</div>
+      <h2 style="font-family:'Baloo 2',cursive;font-size:2.2rem;color:var(--blue-dark);margin-bottom:8px">Bravo !</h2>
+      <p id="quizEndText" style="font-size:1.2rem;color:#556;margin-bottom:24px"></p>
+      <button class="btn btn-primary" onclick="showPanel('quiz');document.getElementById('quizStart').style.display='block';document.getElementById('quizEnd').style.display='none'">🔄 Rejouer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MEMORY ===== -->
+<div class="panel" id="panel-memory">
+  <div class="section-header">
+    <div class="icon">🧠</div>
+    <div>
+      <h2>Jeu de mémoire</h2>
+      <p>Trouve les paires image + mot !</p>
+    </div>
+  </div>
+  <div class="memory-scene">
+    <div class="memory-header">
+      <div class="memory-difficulty">
+        <button class="level-btn active" onclick="initMemory(8)">⭐ Facile (8)</button>
+        <button class="level-btn" onclick="initMemory(12)">⭐⭐ Moyen (12)</button>
+        <button class="level-btn" onclick="initMemory(16)">⭐⭐⭐ Difficile (16)</button>
+      </div>
+      <div class="memory-stats">
+        <div class="memory-stat">
+          <div class="stat-val" id="memPairs">0</div>
+          <div class="stat-lbl">Paires ✅</div>
+        </div>
+        <div class="memory-stat">
+          <div class="stat-val" id="memTries">0</div>
+          <div class="stat-lbl">Essais</div>
+        </div>
+        <div class="memory-stat">
+          <div class="stat-val" id="memTime">0:00</div>
+          <div class="stat-lbl">Temps</div>
+        </div>
+      </div>
+    </div>
+    <div class="memory-grid" id="memoryGrid" style="grid-template-columns:repeat(4,1fr)"></div>
+  </div>
+</div>
+
+<!-- ===== DEVINER LE MOT ===== -->
+<div class="panel" id="panel-wordwheel">
+  <div class="section-header">
+    <div class="icon">🔤</div>
+    <div>
+      <h2>Deviner le mot</h2>
+      <p>Devine le mot caché lettre par lettre !</p>
+    </div>
+  </div>
+  <div class="wordwheel-scene">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+      <button class="level-btn active" onclick="setWwCategory('nourriture')">🍎 Nourriture</button>
+      <button class="level-btn" onclick="setWwCategory('vetements')">🧥 Vêtements</button>
+      <button class="level-btn" onclick="setWwCategory('activites')">⛺ Activités</button>
+      <button class="level-btn" onclick="setWwCategory('tout')">🌈 Tout</button>
+      <button class="btn btn-orange btn-sm" onclick="newWwWord()">🔄 Nouveau mot</button>
+    </div>
+    <div class="ww-category" id="wwCategory">📚 Catégorie : Nourriture</div>
+    <div class="ww-image" id="wwImage">🍎</div>
+    <div class="ww-hint" id="wwHint">💬 Indice : <span id="wwHintText">J'aime manger...</span></div>
+    <div class="hangman-display" id="hangmanHearts"></div>
+    <div class="wordwheel-word" id="wwLetterBoxes"></div>
+    <div class="keyboard" id="wwKeyboard"></div>
+    <div class="ww-end-banner" id="wwEndBanner">
+      <div style="font-size:3rem" id="wwEndEmoji">🎉</div>
+      <h2 id="wwEndTitle">Bravo !</h2>
+      <p id="wwEndMsg" style="margin:8px 0 20px;font-size:1.1rem;color:#556"></p>
+      <button class="btn btn-primary" onclick="newWwWord()">➡️ Mot suivant</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// UTILITY
+// ============================================================
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const idx = ['home','wheel','dnd','quiz','memory','wordwheel'].indexOf(id);
+  if(idx>=0) tabs[idx].classList.add('active');
+}
+
+function confetti(x, y) {
+  const colors = ['#f07d1a','#1a6fb5','#2e9b5e','#f5c518','#e03c3c','#7c3aed'];
+  for(let i=0;i<28;i++){
+    const el = document.createElement('div');
+    el.className='confetti-piece';
+    el.style.left = (x + (Math.random()-0.5)*200) + 'px';
+    el.style.top = (y - 40) + 'px';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.width = (8+Math.random()*8)+'px';
+    el.style.height = (8+Math.random()*8)+'px';
+    el.style.animationDuration = (0.8+Math.random()*1.2)+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 2200);
+  }
+}
+
+// ============================================================
+// ROUE DES NOMS
+// ============================================================
+let students = [
+  'Amara','Baptiste','Camille','Diego','Élise',
+  'Farid','Gabrielle','Hugo','Inès','Julien',
+  'Kenza','Liam','Maëlle','Nathan','Olivia',
+  'Pierre','Rania','Samuel','Théa','Victor'
+];
+let absentStudents = new Set();
+let isSpinning = false;
+let wheelAngle = 0;
+let currentWinner = null;
+
+function renderNamesList() {
+  const list = document.getElementById('namesList');
+  list.innerHTML = students.map((n, i) => `
+    <div class="name-chip ${absentStudents.has(n)?'absent':''}" data-name="${n}">
+      ${n}
+      <span class="remove" onclick="removeName(${i})">×</span>
+    </div>
+  `).join('');
+}
+
+function addName() {
+  const inp = document.getElementById('newNameInput');
+  const name = inp.value.trim();
+  if(name && !students.includes(name)) {
+    students.push(name);
+    inp.value = '';
+    renderNamesList();
+    drawWheel();
+  }
+}
+
+function removeName(i) {
+  absentStudents.delete(students[i]);
+  students.splice(i, 1);
+  renderNamesList();
+  drawWheel();
+}
+
+function markAbsent() {
+  if(currentWinner) {
+    if(absentStudents.has(currentWinner)) absentStudents.delete(currentWinner);
+    else absentStudents.add(currentWinner);
+    renderNamesList();
+    drawWheel();
+  }
+}
+
+function resetAbsent() { absentStudents.clear(); renderNamesList(); drawWheel(); }
+
+function resetWheel() {
+  absentStudents.clear();
+  renderNamesList();
+  document.getElementById('winnerBanner').textContent = '🎯 Tourne la roue !';
+  currentWinner = null;
+  drawWheel();
+}
+
+const WHEEL_COLORS = [
+  '#1a6fb5','#f07d1a','#2e9b5e','#e03c3c','#7c3aed',
+  '#f5c518','#00bcd4','#ff5722','#4caf50','#9c27b0'
+];
+
+function drawWheel(angle = wheelAngle) {
+  const canvas = document.getElementById('wheelCanvas');
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width/2, cy = canvas.height/2, r = cx - 6;
+  const active = students.filter(s => !absentStudents.has(s));
+  if(active.length === 0) { ctx.clearRect(0,0,canvas.width,canvas.height); return; }
+  const slice = (2*Math.PI) / active.length;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Shadow
+  ctx.save();
+  ctx.shadowColor = 'rgba(26,111,181,0.25)';
+  ctx.shadowBlur = 18;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2*Math.PI);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.restore();
+
+  active.forEach((name, i) => {
+    const start = angle + i*slice - Math.PI/2;
+    const end = start + slice;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = WHEEL_COLORS[i % WHEEL_COLORS.length];
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Text
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(start + slice/2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'white';
+    ctx.font = `bold ${active.length > 15 ? 13 : 15}px 'Nunito', sans-serif`;
+    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+    ctx.shadowBlur = 3;
+    ctx.fillText(name, r - 12, 5);
+    ctx.restore();
+  });
+
+  // Center circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, 22, 0, 2*Math.PI);
+  ctx.fillStyle = 'white';
+  ctx.fill();
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+}
+
+function spinWheel() {
+  if(isSpinning) return;
+  const active = students.filter(s => !absentStudents.has(s));
+  if(active.length === 0) return;
+  isSpinning = true;
+  document.getElementById('winnerBanner').textContent = '🎡 …';
+
+  const extraSpins = 5 + Math.random()*5;
+  const targetAngle = wheelAngle + extraSpins * 2 * Math.PI;
+  const duration = 3200 + Math.random()*1200;
+  const start = performance.now();
+  const startAngle = wheelAngle;
+
+  function easeOut(t) { return 1 - Math.pow(1-t, 3); }
+
+  function animate(now) {
+    const elapsed = now - start;
+    const t = Math.min(elapsed / duration, 1);
+    wheelAngle = startAngle + (targetAngle - startAngle) * easeOut(t);
+    drawWheel(wheelAngle);
+    if(t < 1) { requestAnimationFrame(animate); }
+    else {
+      isSpinning = false;
+      const slice = (2*Math.PI) / active.length;
+      const norm = ((-(wheelAngle - Math.PI/2)) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+      const idx = Math.floor(norm / slice) % active.length;
+      currentWinner = active[idx];
+      const banner = document.getElementById('winnerBanner');
+      banner.textContent = `🌟 ${currentWinner} !`;
+      confetti(banner.getBoundingClientRect().left + banner.offsetWidth/2,
+               banner.getBoundingClientRect().top);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+// ============================================================
+// DRAG & DROP
+// ============================================================
+const dndData = {
+  hiver: {
+    zones: [
+      { id: 'z1', label: '❄️ Il fait froid', emoji: '❄️', accepts: ['manteau','tuque','mitaines','bottes','foulard','chandail','pantalon'] },
+      { id: 'z2', label: '🌨️ Il neige', emoji: '🌨️', accepts: ['manteau','tuque','mitaines','bottes','foulard','imperméable'] },
+    ],
+    items: [
+      { id: 'i1', name: 'le manteau', emoji: '🧥', correct: ['z1','z2'] },
+      { id: 'i2', name: 'la tuque', emoji: '🎩', correct: ['z1','z2'] },
+      { id: 'i3', name: 'les mitaines', emoji: '🧤', correct: ['z1','z2'] },
+      { id: 'i4', name: 'les bottes', emoji: '👢', correct: ['z1','z2'] },
+      { id: 'i5', name: 'le foulard', emoji: '🧣', correct: ['z1','z2'] },
+      { id: 'i6', name: 'le short', emoji: '🩳', correct: [] },
+      { id: 'i7', name: 'les sandales', emoji: '👡', correct: [] },
+      { id: 'i8', name: 'le maillot', emoji: '👙', correct: [] },
+    ]
+  },
+  ete: {
+    zones: [
+      { id: 'z1', label: '☀️ Il fait chaud', emoji: '☀️', accepts: ['short','sandales','t-shirt','chapeau','lunettes','maillot'] },
+      { id: 'z2', label: '🌧️ Il pleut', emoji: '🌧️', accepts: ['imperméable','bottes','parapluie','chandail'] },
+    ],
+    items: [
+      { id: 'i1', name: 'le t-shirt', emoji: '👕', correct: ['z1'] },
+      { id: 'i2', name: 'le short', emoji: '🩳', correct: ['z1'] },
+      { id: 'i3', name: 'les sandales', emoji: '👡', correct: ['z1'] },
+      { id: 'i4', name: 'le chapeau', emoji: '👒', correct: ['z1'] },
+      { id: 'i5', name: 'l\'imperméable', emoji: '🌂', correct: ['z2'] },
+      { id: 'i6', name: 'les bottes', emoji: '👢', correct: ['z2'] },
+      { id: 'i7', name: 'le manteau', emoji: '🧥', correct: [] },
+      { id: 'i8', name: 'la tuque', emoji: '🎩', correct: [] },
+    ]
+  },
+  mixte: {
+    zones: [
+      { id: 'z1', label: '❄️ En hiver', emoji: '❄️', accepts: ['manteau','tuque','mitaines','bottes','foulard','chandail'] },
+      { id: 'z2', label: '☀️ En été', emoji: '☀️', accepts: ['short','sandales','t-shirt','chapeau','maillot'] },
+      { id: 'z3', label: '🍂 En automne', emoji: '🍂', accepts: ['imperméable','bottes','chandail','pantalon','foulard'] },
+    ],
+    items: [
+      { id: 'i1', name: 'le manteau', emoji: '🧥', correct: ['z1'] },
+      { id: 'i2', name: 'la tuque', emoji: '🎩', correct: ['z1'] },
+      { id: 'i3', name: 'le short', emoji: '🩳', correct: ['z2'] },
+      { id: 'i4', name: 'le t-shirt', emoji: '👕', correct: ['z2'] },
+      { id: 'i5', name: 'l\'imperméable', emoji: '🌂', correct: ['z3'] },
+      { id: 'i6', name: 'les bottes', emoji: '👢', correct: ['z1','z3'] },
+      { id: 'i7', name: 'les mitaines', emoji: '🧤', correct: ['z1'] },
+      { id: 'i8', name: 'les sandales', emoji: '👡', correct: ['z2'] },
+      { id: 'i9', name: 'le chandail', emoji: '👔', correct: ['z1','z3'] },
+      { id: 'i10', name: 'le chapeau', emoji: '👒', correct: ['z2'] },
+    ]
+  }
+};
+
+let currentDndLevel = 'hiver';
+let dndDropped = {}; // zoneId -> [itemId]
+let draggedItem = null;
+let dndCorrect = 0, dndTotal = 0;
+
+function setDndLevel(level) {
+  currentDndLevel = level;
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  initDnd();
+}
+
+function initDnd() {
+  const data = dndData[currentDndLevel];
+  dndDropped = {};
+  data.zones.forEach(z => dndDropped[z.id] = []);
+  dndCorrect = 0; dndTotal = 0;
+  document.getElementById('dndStars').textContent = '';
+  document.getElementById('dndScore').textContent = '⭐ Score : 0 / 0';
+
+  // Render items
+  const shuffled = [...data.items].sort(() => Math.random()-0.5);
+  document.getElementById('dndItems').innerHTML = shuffled.map(item => `
+    <div class="drag-item" id="ditem-${item.id}" draggable="true"
+      ondragstart="dragStart('${item.id}')" ondragend="dragEnd()">
+      <span class="item-emoji">${item.emoji}</span>
+      <span>${item.name}</span>
+    </div>
+  `).join('');
+
+  // Render zones
+  document.getElementById('dndTargets').innerHTML = data.zones.map(zone => `
+    <div class="drop-zone" id="${zone.id}"
+      ondragover="dragOver(event,'${zone.id}')"
+      ondragleave="dragLeave('${zone.id}')"
+      ondrop="dropItem(event,'${zone.id}')">
+      <div class="drop-zone-label">
+        <span class="big-emoji">${zone.emoji}</span>
+        <span>${zone.label}</span>
+      </div>
+      <div id="${zone.id}-drops"></div>
+    </div>
+  `).join('');
+}
+
+function dragStart(itemId) {
+  draggedItem = itemId;
+  setTimeout(()=>{ const el=document.getElementById('ditem-'+itemId); if(el) el.classList.add('dragging'); }, 0);
+}
+function dragEnd() {
+  if(draggedItem) { const el=document.getElementById('ditem-'+draggedItem); if(el) el.classList.remove('dragging'); }
+  draggedItem = null;
+}
+function dragOver(e, zoneId) { e.preventDefault(); document.getElementById(zoneId).classList.add('dragover'); }
+function dragLeave(zoneId) { document.getElementById(zoneId).classList.remove('dragover'); }
+
+function dropItem(e, zoneId) {
+  e.preventDefault();
+  if(!draggedItem) return;
+  const zone = document.getElementById(zoneId);
+  zone.classList.remove('dragover');
+
+  const data = dndData[currentDndLevel];
+  const item = data.items.find(i=>i.id===draggedItem);
+  if(!item) return;
+
+  // Remove from previous zone
+  data.zones.forEach(z => {
+    dndDropped[z.id] = dndDropped[z.id].filter(id=>id!==draggedItem);
+    renderDroppedItems(z.id);
+  });
+
+  // Add to new zone & hide from source
+  dndDropped[zoneId].push(draggedItem);
+  const srcEl = document.getElementById('ditem-'+draggedItem);
+  if(srcEl) srcEl.style.display = 'none';
+  renderDroppedItems(zoneId);
+  draggedItem = null;
+}
+
+function renderDroppedItems(zoneId) {
+  const data = dndData[currentDndLevel];
+  const cont = document.getElementById(zoneId+'-drops');
+  if(!cont) return;
+  cont.innerHTML = dndDropped[zoneId].map(itemId => {
+    const item = data.items.find(i=>i.id===itemId);
+    return `<div class="dropped-item" id="dropped-${zoneId}-${itemId}">
+      <span>${item.emoji} ${item.name}</span>
+      <span class="undo-btn" onclick="undropItem('${zoneId}','${itemId}')">↩</span>
+    </div>`;
+  }).join('');
+}
+
+function undropItem(zoneId, itemId) {
+  dndDropped[zoneId] = dndDropped[zoneId].filter(id=>id!==itemId);
+  renderDroppedItems(zoneId);
+  const srcEl = document.getElementById('ditem-'+itemId);
+  if(srcEl) { srcEl.style.display='flex'; srcEl.classList.remove('dragging'); }
+}
+
+function checkDnd() {
+  const data = dndData[currentDndLevel];
+  dndCorrect = 0; dndTotal = 0;
+  data.zones.forEach(zone => {
+    dndDropped[zone.id].forEach(itemId => {
+      dndTotal++;
+      const item = data.items.find(i=>i.id===itemId);
+      const isCorrect = item.correct.includes(zone.id);
+      if(isCorrect) dndCorrect++;
+      const el = document.getElementById(`dropped-${zone.id}-${itemId}`);
+      if(el) { el.classList.remove('correct','wrong'); el.classList.add(isCorrect?'correct':'wrong'); }
+    });
+  });
+  const stars = dndTotal===0?0:Math.round((dndCorrect/dndTotal)*3);
+  document.getElementById('dndScore').textContent = `⭐ Score : ${dndCorrect} / ${dndTotal}`;
+  document.getElementById('dndStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
+  if(dndCorrect===dndTotal && dndTotal>0) {
+    const bar = document.getElementById('dndScore');
+    confetti(bar.getBoundingClientRect().left+100, bar.getBoundingClientRect().top);
+  }
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+const quizData = {
+  nourriture: [
+    { emoji:'🍎', question:"Qu'est-ce que c'est ?", answer:'une pomme', choices:['une pomme','une carotte','une banane','un raisin'], structure:"C'est..." },
+    { emoji:'🥕', question:"Qu'est-ce que c'est ?", answer:'une carotte', choices:['une tomate','une carotte','une banane','un brocoli'], structure:"C'est..." },
+    { emoji:'🍌', question:"Qu'est-ce que c'est ?", answer:'une banane', choices:['une pomme','un raisin','une banane','une poire'], structure:"C'est..." },
+    { emoji:'🥪', question:"Qu'est-ce qu'il y a dans la boîte à lunch ?", answer:'un sandwich', choices:['un gâteau','un sandwich','une pizza','un hamburger'], structure:"Dans ma boîte à lunch, il y a..." },
+    { emoji:'🍊', question:"Qu'est-ce que c'est ?", answer:'une orange', choices:['une orange','une tomate','une pomme','une pêche'], structure:"C'est..." },
+    { emoji:'🧃', question:"Qu'est-ce qu'il y a dans ta boîte à lunch ?", answer:'un jus', choices:['du lait','un jus','de l\'eau','un yogourt'], structure:"Dans ma boîte à lunch, il y a..." },
+    { emoji:'🥦', question:"Quel légume est-ce ?", answer:'du brocoli', choices:['des carottes','des tomates','du brocoli','de la laitue'], structure:"C'est..." },
+    { emoji:'🍓', question:"Qu'est-ce que c'est ?", answer:'une fraise', choices:['une cerise','une fraise','une framboise','un raisin'], structure:"C'est..." },
+    { emoji:'🧀', question:"Qu'est-ce que tu vois ?", answer:'du fromage', choices:['du pain','du beurre','du fromage','du yogourt'], structure:"C'est..." },
+    { emoji:'🍇', question:"Qu'est-ce que c'est ?", answer:'des raisins', choices:['des cerises','des bleuets','des raisins','des framboises'], structure:"C'est..." },
+  ],
+  vetements: [
+    { emoji:'🧥', question:"Qu'est-ce qu'on porte en hiver ?", answer:'un manteau', choices:['un short','un manteau','un t-shirt','un maillot'], structure:"En hiver, je porte..." },
+    { emoji:'🎩', question:"Qu'est-ce que c'est ?", answer:'une tuque', choices:['un chapeau','une tuque','un casque','un bonnet'], structure:"Je porte..." },
+    { emoji:'🧤', question:"Qu'est-ce qu'on porte quand il fait froid ?", answer:'des mitaines', choices:['des sandales','des mitaines','des gants de cuisine','des bottes'], structure:"Quand il fait froid, je porte..." },
+    { emoji:'🩳', question:"Qu'est-ce qu'on porte en été ?", answer:'un short', choices:['un pantalon','un short','une tuque','un manteau'], structure:"En été, je porte..." },
+    { emoji:'👢', question:"Qu'est-ce qu'on porte quand il neige ?", answer:'des bottes', choices:['des sandales','des souliers','des bottes','des pantoufles'], structure:"Quand il neige, je porte..." },
+    { emoji:'🌂', question:"Qu'est-ce qu'on utilise quand il pleut ?", answer:'un imperméable', choices:['un imperméable','un manteau','une tuque','un foulard'], structure:"Quand il pleut, je porte..." },
+    { emoji:'👒', question:"Qu'est-ce qu'on porte au soleil ?", answer:'un chapeau', choices:['une tuque','un chapeau','un casque','une casquette'], structure:"Au soleil, je porte..." },
+    { emoji:'🧣', question:"Qu'est-ce que c'est ?", answer:'un foulard', choices:['un manteau','un foulard','une ceinture','un sac'], structure:"Je porte..." },
+    { emoji:'👕', question:"Qu'est-ce qu'on porte en été ?", answer:'un t-shirt', choices:['un chandail','un t-shirt','un veston','une chemise'], structure:"En été, je porte..." },
+    { emoji:'👡', question:"Qu'est-ce qu'on porte en été ?", answer:'des sandales', choices:['des bottes','des pantoufles','des sandales','des souliers'], structure:"En été, je porte..." },
+  ],
+  activites: [
+    { emoji:'⛺', question:"Qu'est-ce que la famille fait ?", answer:'du camping', choices:['du camping','du ski','de la natation','du vélo'], structure:"J'aime faire..." },
+    { emoji:'🚴', question:"Quelle activité est-ce ?", answer:'du vélo', choices:['de la course','du vélo','du soccer','de la natation'], structure:"Je veux faire..." },
+    { emoji:'🏊', question:"Quelle activité est-ce ?", answer:'de la natation', choices:['du ski','de la course','de la natation','du vélo'], structure:"J'aime faire..." },
+    { emoji:'🥾', question:"Quelle activité est-ce ?", answer:'de la randonnée', choices:['du camping','de la randonnée','du ski','du jogging'], structure:"Pour l'excursion, je veux faire..." },
+    { emoji:'⛷️', question:"Quelle activité est-ce ?", answer:'du ski', choices:['du ski','de la luge','du patin','de la raquette'], structure:"J'aime faire..." },
+    { emoji:'🎣', question:"Quelle activité est-ce ?", answer:'de la pêche', choices:['de la chasse','de la pêche','du kayak','de la plongée'], structure:"J'aime faire..." },
+    { emoji:'🏕️', question:"Qu'est-ce qu'on fait en famille ?", answer:'un pique-nique', choices:['un pique-nique','un camping','une randonnée','une sortie'], structure:"Nous faisons..." },
+    { emoji:'⚽', question:"Quelle activité est-ce ?", answer:'du soccer', choices:['du soccer','du hockey','du basketball','du tennis'], structure:"J'aime jouer..." },
+    { emoji:'🛶', question:"Quelle activité est-ce ?", answer:'du canot', choices:['du kayak','du bateau','du canot','du surf'], structure:"Pour l'excursion, je veux faire..." },
+    { emoji:'🌱', question:"Quelle activité est-ce ?", answer:'du jardinage', choices:['du jardinage','de la cuisine','du bricolage','de la peinture'], structure:"J'aime faire..." },
+  ]
+};
+
+let quizQuestions = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizTimer = null;
+let quizTimeLeft = 10;
+let quizAnswered = false;
+
+function startQuiz(cat) {
+  let pool = [];
+  if(cat === 'mixte' || cat === 'tout') {
+    pool = [...quizData.nourriture, ...quizData.vetements, ...quizData.activites];
+  } else {
+    pool = [...quizData[cat]];
+  }
+  quizQuestions = pool.sort(()=>Math.random()-0.5).slice(0,10);
+  quizIndex = 0; quizScore = 0;
+  document.getElementById('quizStart').style.display = 'none';
+  document.getElementById('quizEnd').style.display = 'none';
+  document.getElementById('quizGame').style.display = 'block';
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  if(quizIndex >= quizQuestions.length) { endQuiz(); return; }
+  clearInterval(quizTimer);
+  quizAnswered = false;
+  quizTimeLeft = 10;
+  const q = quizQuestions[quizIndex];
+  document.getElementById('quizProgress').textContent = `Question ${quizIndex+1} / ${quizQuestions.length}`;
+  document.getElementById('quizScoreDisplay').textContent = `✅ ${quizScore}`;
+  document.getElementById('quizEmoji').textContent = q.emoji;
+  document.getElementById('quizQText').textContent = q.question;
+  document.getElementById('quizStructure').textContent = q.structure;
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+
+  const shuffled = [...q.choices].sort(()=>Math.random()-0.5);
+  const emojiMap = { 'une pomme':'🍎','une carotte':'🥕','une banane':'🍌','un raisin':'🍇','une tomate':'🍅','une poire':'🍐','une orange':'🍊','un sandwich':'🥪','un gâteau':'🎂','une pizza':'🍕','du brocoli':'🥦','une fraise':'🍓','du fromage':'🧀','des raisins':'🍇','un manteau':'🧥','une tuque':'🎩','des mitaines':'🧤','un short':'🩳','des bottes':'👢','un imperméable':'🌂','un chapeau':'👒','un foulard':'🧣','un t-shirt':'👕','des sandales':'👡','du camping':'⛺','du vélo':'🚴','de la natation':'🏊','de la randonnée':'🥾','du ski':'⛷️','de la pêche':'🎣','un pique-nique':'🏕️','du soccer':'⚽','du canot':'🛶','du jardinage':'🌱','un jus':'🧃','du lait':'🥛','de l\'eau':'💧','un yogourt':'🥛','des carottes':'🥕','des tomates':'🍅','de la laitue':'🥬','une cerise':'🍒','une framboise':'🫐','des cerises':'🍒','des bleuets':'🫐','des framboises':'🫐','du pain':'🍞','du beurre':'🧈' };
+  document.getElementById('quizChoices').innerHTML = shuffled.map(c => `
+    <div class="quiz-choice" onclick="selectAnswer('${c.replace(/'/g,"\\'")}','${q.answer.replace(/'/g,"\\'")}')">
+      <span class="c-emoji">${emojiMap[c]||'❓'}</span>
+      <span>${c}</span>
+    </div>
+  `).join('');
+
+  updateTimer();
+  quizTimer = setInterval(()=>{
+    quizTimeLeft--;
+    updateTimer();
+    if(quizTimeLeft <= 0) { clearInterval(quizTimer); if(!quizAnswered) timeOut(); }
+  }, 1000);
+}
+
+function updateTimer() {
+  const pct = quizTimeLeft * 10;
+  const d = document.getElementById('timerDisplay');
+  d.textContent = quizTimeLeft;
+  d.parentElement.style.setProperty('--p', pct);
+  d.parentElement.style.background = `conic-gradient(${quizTimeLeft>5?'var(--orange)':'var(--red)'} calc(${pct} * 1%), #eee 0)`;
+}
+
+function selectAnswer(chosen, correct) {
+  if(quizAnswered) return;
+  quizAnswered = true;
+  clearInterval(quizTimer);
+  const isCorrect = chosen === correct;
+  if(isCorrect) quizScore++;
+
+  document.querySelectorAll('.quiz-choice').forEach(el => {
+    const txt = el.querySelector('span:last-child').textContent;
+    if(txt === chosen) el.classList.add(isCorrect?'selected-correct':'selected-wrong');
+    if(txt === correct) el.classList.add('reveal-correct');
+    el.style.pointerEvents = 'none';
+  });
+
+  const fb = document.getElementById('quizFeedback');
+  fb.className = 'quiz-feedback show ' + (isCorrect?'correct':'wrong');
+  fb.textContent = isCorrect ? '✅ Bravo ! C\'est correct !' : `❌ La bonne réponse : ${correct}`;
+  if(isCorrect) {
+    const el = document.querySelector('.quiz-choice.selected-correct');
+    if(el) confetti(el.getBoundingClientRect().left+60, el.getBoundingClientRect().top);
+  }
+  document.getElementById('quizScoreDisplay').textContent = `✅ ${quizScore}`;
+  setTimeout(()=>{ quizIndex++; showQuizQuestion(); }, 1800);
+}
+
+function timeOut() {
+  quizAnswered = true;
+  const q = quizQuestions[quizIndex];
+  document.querySelectorAll('.quiz-choice').forEach(el => {
+    if(el.querySelector('span:last-child').textContent === q.answer) el.classList.add('reveal-correct');
+    el.style.pointerEvents = 'none';
+  });
+  const fb = document.getElementById('quizFeedback');
+  fb.className = 'quiz-feedback show wrong';
+  fb.textContent = `⏰ Temps écoulé ! La réponse : ${q.answer}`;
+  setTimeout(()=>{ quizIndex++; showQuizQuestion(); }, 1800);
+}
+
+function endQuiz() {
+  clearInterval(quizTimer);
+  document.getElementById('quizGame').style.display = 'none';
+  document.getElementById('quizEnd').style.display = 'block';
+  const pct = Math.round(quizScore/quizQuestions.length*100);
+  document.getElementById('quizEndEmoji').textContent = pct>=80?'🏆':pct>=50?'🌟':'😊';
+  document.getElementById('quizEndText').textContent = `${quizScore} / ${quizQuestions.length} — ${pct>=80?'Excellent !':pct>=50?'Bien !':'Continue comme ça !'}`;
+  if(pct>=80) confetti(window.innerWidth/2, 200);
+}
+
+// ============================================================
+// MEMORY
+// ============================================================
+const memoryItems = [
+  { id:'m1', emoji:'🍎', word:'une pomme' },
+  { id:'m2', emoji:'🥕', word:'une carotte' },
+  { id:'m3', emoji:'🍌', word:'une banane' },
+  { id:'m4', emoji:'🧥', word:'un manteau' },
+  { id:'m5', emoji:'⛺', word:'le camping' },
+  { id:'m6', emoji:'🧤', word:'des mitaines' },
+  { id:'m7', emoji:'🥪', word:'un sandwich' },
+  { id:'m8', emoji:'🚴', word:'le vélo' },
+  { id:'m9', emoji:'🍊', word:'une orange' },
+  { id:'m10', emoji:'🎩', word:'une tuque' },
+  { id:'m11', emoji:'🥦', word:'du brocoli' },
+  { id:'m12', emoji:'🥾', word:'la randonnée' },
+  { id:'m13', emoji:'🍓', word:'une fraise' },
+  { id:'m14', emoji:'👢', word:'des bottes' },
+  { id:'m15', emoji:'🏊', word:'la natation' },
+  { id:'m16', emoji:'🧣', word:'un foulard' },
+];
+
+let memFlipped = [];
+let memMatched = new Set();
+let memTries = 0, memPairsFound = 0;
+let memLocked = false;
+let memTimerInt = null, memStartTime = null;
+let memTotal = 8;
+
+function initMemory(count) {
+  memTotal = count;
+  document.querySelectorAll('.memory-difficulty .level-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  memFlipped=[]; memMatched=new Set(); memTries=0; memPairsFound=0; memLocked=false;
+  clearInterval(memTimerInt);
+  document.getElementById('memPairs').textContent='0';
+  document.getElementById('memTries').textContent='0';
+  document.getElementById('memTime').textContent='0:00';
+
+  const pairs = memoryItems.slice(0, count/2);
+  const cols = count<=8?4:count<=12?4:4;
+  document.getElementById('memoryGrid').style.gridTemplateColumns=`repeat(${cols},1fr)`;
+
+  const cards = [];
+  pairs.forEach(item => {
+    cards.push({ uid: item.id+'_emoji', pairId: item.id, type:'emoji', emoji:item.emoji, word:item.word });
+    cards.push({ uid: item.id+'_word', pairId: item.id, type:'word', emoji:item.emoji, word:item.word });
+  });
+  cards.sort(()=>Math.random()-0.5);
+
+  document.getElementById('memoryGrid').innerHTML = cards.map(card => `
+    <div class="memory-card" id="mc-${card.uid}" onclick="flipCard('${card.uid}','${card.pairId}','${card.type}')">
+      <div class="memory-card-inner">
+        <div class="memory-card-front">🎒</div>
+        <div class="memory-card-back">
+          ${card.type==='emoji'
+            ? `<div style="font-size:2.2rem">${card.emoji}</div>`
+            : `<div class="card-word">${card.word}</div>`
+          }
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  memStartTime = Date.now();
+  memTimerInt = setInterval(updateMemTimer, 1000);
+}
+
+function updateMemTimer() {
+  const s = Math.floor((Date.now()-memStartTime)/1000);
+  document.getElementById('memTime').textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+}
+
+function flipCard(uid, pairId, type) {
+  if(memLocked) return;
+  if(memMatched.has(pairId)) return;
+  if(memFlipped.find(f=>f.uid===uid)) return;
+
+  const el = document.getElementById('mc-'+uid);
+  el.classList.add('flipped');
+  memFlipped.push({ uid, pairId, type });
+
+  if(memFlipped.length === 2) {
+    memTries++;
+    document.getElementById('memTries').textContent = memTries;
+    memLocked = true;
+    const [a, b] = memFlipped;
+    if(a.pairId === b.pairId && a.type !== b.type) {
+      // Match!
+      memPairsFound++;
+      memMatched.add(pairId);
+      document.getElementById('memPairs').textContent = memPairsFound;
+      [a, b].forEach(f => { const e=document.getElementById('mc-'+f.uid); e.classList.add('matched'); });
+      memFlipped = [];
+      memLocked = false;
+      const me = document.getElementById('mc-'+uid);
+      confetti(me.getBoundingClientRect().left+me.offsetWidth/2, me.getBoundingClientRect().top);
+      if(memPairsFound === memTotal/2) {
+        clearInterval(memTimerInt);
+        setTimeout(()=>confetti(window.innerWidth/2, 200), 300);
+      }
+    } else {
+      setTimeout(()=>{
+        [a,b].forEach(f => document.getElementById('mc-'+f.uid).classList.remove('flipped'));
+        memFlipped=[];
+        memLocked=false;
+      }, 900);
+    }
+  }
+}
+
+// ============================================================
+// DEVINER LE MOT
+// ============================================================
+const wwData = {
+  nourriture: [
+    { word:'POMME', emoji:'🍎', hint:'J\'aime manger...', structure:'C\'est une...' },
+    { word:'BANANE', emoji:'🍌', hint:'C\'est un fruit jaune', structure:'C\'est une...' },
+    { word:'CAROTTE', emoji:'🥕', hint:'C\'est un légume orange', structure:'C\'est une...' },
+    { word:'SANDWICH', emoji:'🥪', hint:'Dans ma boîte à lunch, il y a un...', structure:'Il y a un...' },
+    { word:'ORANGE', emoji:'🍊', hint:'C\'est un fruit rond et orange', structure:'C\'est une...' },
+    { word:'BROCOLI', emoji:'🥦', hint:'C\'est un légume vert', structure:'C\'est du...' },
+    { word:'FRAISE', emoji:'🍓', hint:'C\'est un petit fruit rouge', structure:'C\'est une...' },
+  ],
+  vetements: [
+    { word:'MANTEAU', emoji:'🧥', hint:'Je porte ça en hiver pour avoir chaud', structure:'En hiver, je porte un...' },
+    { word:'BOTTES', emoji:'👢', hint:'Je porte ça dans mes pieds quand il neige', structure:'Je porte des...' },
+    { word:'TUQUE', emoji:'🎩', hint:'Je porte ça sur ma tête en hiver', structure:'Je porte une...' },
+    { word:'MITAINES', emoji:'🧤', hint:'Je porte ça dans mes mains quand il fait froid', structure:'Je porte des...' },
+    { word:'FOULARD', emoji:'🧣', hint:'Je porte ça autour de mon cou', structure:'Je porte un...' },
+    { word:'CHAPEAU', emoji:'👒', hint:'Je porte ça sur ma tête en été', structure:'En été, je porte un...' },
+  ],
+  activites: [
+    { word:'CAMPING', emoji:'⛺', hint:'On dort dans une tente en famille', structure:'J\'aime faire du...' },
+    { word:'RANDONNEE', emoji:'🥾', hint:'On marche dans la forêt', structure:'Je veux faire de la...' },
+    { word:'NATATION', emoji:'🏊', hint:'On nage dans l\'eau', structure:'J\'aime faire de la...' },
+    { word:'PIQUE-NIQUE', emoji:'🧺', hint:'On mange dehors dans un parc', structure:'Nous faisons un...' },
+    { word:'VELO', emoji:'🚴', hint:'On pédale sur deux roues', structure:'J\'aime faire du...' },
+  ]
+};
+
+let wwCategory = 'nourriture';
+let wwCurrentWord = null;
+let wwGuessed = new Set();
+let wwWrong = 0;
+const WW_MAX_WRONG = 6;
+
+function setWwCategory(cat) {
+  wwCategory = cat;
+  document.querySelectorAll('.wordwheel-scene .level-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  newWwWord();
+}
+
+function getWwPool() {
+  if(wwCategory === 'tout') return [...wwData.nourriture,...wwData.vetements,...wwData.activites];
+  return wwData[wwCategory] || wwData.nourriture;
+}
+
+function newWwWord() {
+  const pool = getWwPool();
+  wwCurrentWord = pool[Math.floor(Math.random()*pool.length)];
+  wwGuessed = new Set();
+  wwWrong = 0;
+  document.getElementById('wwEndBanner').classList.remove('show');
+  renderWw();
+}
+
+function renderWw() {
+  const w = wwCurrentWord;
+  document.getElementById('wwImage').textContent = w.emoji;
+  document.getElementById('wwHintText').textContent = w.hint;
+  const catLabels = { nourriture:'🍎 Nourriture', vetements:'🧥 Vêtements', activites:'⛺ Activités', tout:'🌈 Tout' };
+  document.getElementById('wwCategory').textContent = `📚 Catégorie : ${catLabels[wwCategory]||'Tout'} &nbsp;|&nbsp; Structure : ${w.structure}`;
+
+  // Hearts
+  let hearts = '';
+  for(let i=0;i<WW_MAX_WRONG;i++) hearts += `<span class="hangman-heart ${i<wwWrong?'lost':''}">❤️</span>`;
+  document.getElementById('hangmanHearts').innerHTML = hearts;
+
+  // Letter boxes
+  const letters = w.word.replace('-','').replace(' ','').split('');
+  const unique = [...new Set(w.word.split(''))].filter(c=>c!=='-'&&c!==' ');
+  const allRevealed = unique.every(c=>wwGuessed.has(c));
+
+  document.getElementById('wwLetterBoxes').innerHTML = w.word.split('').map(c => {
+    if(c==='-'||c===' ') return `<div style="width:20px;display:flex;align-items:flex-end;justify-content:center;font-size:1.5rem;padding-bottom:4px">${c}</div>`;
+    const revealed = wwGuessed.has(c) || allRevealed;
+    return `<div class="letter-box ${revealed?'revealed':''} ${!revealed&&wwWrong>=WW_MAX_WRONG?'wrong-guess':''}">${revealed?c:''}</div>`;
+  }).join('');
+
+  // Keyboard
+  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  document.getElementById('wwKeyboard').innerHTML = alpha.map(c => {
+    const used = wwGuessed.has(c);
+    const correct = used && w.word.includes(c);
+    const wrong = used && !w.word.includes(c);
+    return `<button class="key-btn ${correct?'used-correct':''} ${wrong?'used-wrong':''}"
+      onclick="guessLetter('${c}')" ${used?'disabled':''}>${c}</button>`;
+  }).join('');
+
+  // Check win/lose
+  if(allRevealed) {
+    showWwEnd(true);
+  } else if(wwWrong >= WW_MAX_WRONG) {
+    wwGuessed = new Set(w.word.split(''));
+    renderWw();
+    showWwEnd(false);
+  }
+}
+
+function guessLetter(letter) {
+  if(wwGuessed.has(letter)) return;
+  wwGuessed.add(letter);
+  if(!wwCurrentWord.word.includes(letter)) wwWrong++;
+  renderWw();
+}
+
+function showWwEnd(won) {
+  const banner = document.getElementById('wwEndBanner');
+  banner.style.background = won ? 'linear-gradient(135deg,#e8f8ef,#b8f0cc)' : 'linear-gradient(135deg,#ffeeee,#ffd0d0)';
+  document.getElementById('wwEndEmoji').textContent = won ? '🎉' : '😔';
+  document.getElementById('wwEndTitle').textContent = won ? 'Bravo ! Tu as trouvé !' : 'Presque !';
+  document.getElementById('wwEndMsg').textContent = won
+    ? `Le mot était : ${wwCurrentWord.word} ${wwCurrentWord.emoji}`
+    : `Le mot était : ${wwCurrentWord.word} ${wwCurrentWord.emoji}`;
+  banner.classList.add('show');
+  if(won) confetti(window.innerWidth/2, window.innerHeight/2);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderNamesList();
+  drawWheel();
+  initDnd();
+  initMemory(8);
+  newWwWord();
+});
+</script>
+</body>
+</html>
