@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J'aime...! 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:   #0D9488;
+    --tealL:  #CCFBF1;
+    --orange: #EA580C;
+    --yellow: #FCD34D;
+    --green:  #10B981;
+    --red:    #EF4444;
+    --bg:     #F0FDFA;
+    --dark:   #134E4A;
+    --muted:  #5EEAD4;
+    --white:  #FFFFFF;
+    --pink:   #EC4899;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px;
+  }
+  .deco-bar { font-size: 1.5rem; letter-spacing: 5px; margin-bottom: 6px; text-align:center; }
+
+  /* Floating stars */
+  .star { position:fixed; font-size:1.3rem; opacity:0.15; pointer-events:none;
+    animation: floatS 5s ease-in-out infinite; }
+  @keyframes floatS {
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-18px) rotate(12deg);}
+  }
+
+  header {
+    width:100%; max-width:580px;
+    background: var(--teal);
+    border-radius:22px; padding:16px 22px 12px;
+    text-align:center; margin-bottom:12px;
+    box-shadow: 0 6px 20px rgba(13,148,136,0.35);
+    position:relative; overflow:hidden;
+  }
+  header::before {
+    content:"❤️ ⭐ ❤️ ⭐ ❤️ ⭐ ❤️";
+    position:absolute; top:5px; left:0; right:0;
+    font-size:0.75rem; opacity:0.35; letter-spacing:3px;
+  }
+  header h1 { font-size:clamp(1.6rem,5vw,2.1rem); font-weight:900;
+    color:var(--yellow); margin-top:8px; text-shadow:2px 2px 0 rgba(0,0,0,0.15); }
+  header p { color:rgba(255,255,255,0.85); font-size:1rem; font-weight:700; margin-top:3px; }
+
+  .hud { width:100%; max-width:580px; display:flex; gap:10px; margin-bottom:10px; }
+  .hud-pill { flex:1; background:var(--white); border-radius:50px; padding:9px 14px;
+    font-size:1rem; font-weight:800; color:var(--dark); text-align:center;
+    box-shadow:0 3px 10px rgba(0,0,0,0.07); display:flex; align-items:center;
+    justify-content:center; gap:5px; }
+
+  .prog-wrap { width:100%; max-width:580px; background:var(--tealL);
+    border-radius:50px; height:13px; margin-bottom:12px; overflow:hidden; }
+  .prog-fill { height:100%;
+    background:linear-gradient(90deg,var(--teal),var(--orange));
+    border-radius:50px; transition:width 0.5s ease; }
+
+  .model-box { width:100%; max-width:580px; background:var(--yellow);
+    border-radius:16px; padding:11px 18px; margin-bottom:12px;
+    text-align:center; font-size:1rem; font-weight:800; color:var(--dark);
+    box-shadow:0 3px 10px rgba(252,211,77,0.4); }
+
+  .card { width:100%; max-width:580px; background:var(--white);
+    border-radius:22px; padding:22px 18px;
+    box-shadow:0 8px 26px rgba(13,148,136,0.12); margin-bottom:12px; }
+
+  .scene { display:flex; align-items:flex-start; gap:12px; margin-bottom:20px; }
+  .avatar { font-size:3.2rem; flex-shrink:0; animation:wob 3s ease-in-out infinite; }
+  @keyframes wob { 0%,100%{transform:rotate(-3deg);} 50%{transform:rotate(3deg);} }
+  .bubble { background:var(--tealL); border:3px solid var(--teal);
+    border-radius:16px 16px 16px 4px; padding:12px 16px;
+    font-size:1.2rem; font-weight:800; color:var(--dark); line-height:1.5; flex:1; }
+  .blank { display:inline-block; min-width:70px; border-bottom:3px solid var(--teal);
+    color:var(--teal); text-align:center; }
+
+  .q-label { font-size:0.88rem; font-weight:800; color:var(--teal);
+    text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px; }
+
+  .options { display:flex; flex-direction:column; gap:9px; }
+  .opt-btn { background:var(--bg); border:3px solid var(--tealL);
+    border-radius:15px; padding:13px 16px;
+    font-family:'Nunito',sans-serif; font-size:1.12rem; font-weight:800;
+    color:var(--dark); cursor:pointer;
+    display:flex; align-items:center; gap:11px;
+    transition:all 0.15s ease; text-align:left; }
+  .opt-btn:hover:not(:disabled) { background:var(--tealL); border-color:var(--teal); transform:translateX(5px); }
+  .opt-letter { background:var(--teal); color:var(--white); border-radius:9px;
+    width:34px; height:34px; display:flex; align-items:center;
+    justify-content:center; font-size:0.95rem; flex-shrink:0; }
+  .opt-btn.correct { background:#D1FAE5; border-color:var(--green); }
+  .opt-btn.correct .opt-letter { background:var(--green); }
+  .opt-btn.wrong { background:#FEE2E2; border-color:var(--red); }
+  .opt-btn.wrong .opt-letter { background:var(--red); }
+  .opt-btn:disabled { cursor:default; }
+
+  .feedback { display:none; border-radius:13px; padding:13px 16px;
+    font-size:1.05rem; font-weight:800; text-align:center; margin-top:12px;
+    animation:pop 0.3s cubic-bezier(.4,0,.2,1); }
+  @keyframes pop { from{transform:scale(0.7);opacity:0;} to{transform:scale(1);opacity:1;} }
+  .feedback.good { display:block; background:#D1FAE5; color:#065F46; }
+  .feedback.bad  { display:block; background:#FEE2E2; color:#991B1B; }
+
+  .next-btn { display:none; width:100%;
+    background:linear-gradient(135deg,var(--teal),var(--orange));
+    color:var(--white); border:none; border-radius:15px; padding:15px;
+    font-family:'Nunito',sans-serif; font-size:1.1rem; font-weight:900;
+    cursor:pointer; margin-top:11px;
+    box-shadow:0 5px 15px rgba(13,148,136,0.35);
+    transition:transform 0.15s ease; }
+  .next-btn:hover{transform:scale(1.02);}
+  .next-btn.show{display:block;}
+
+  .star-burst{position:fixed;font-size:2rem;pointer-events:none;
+    animation:burst 1s ease-out forwards;z-index:999;}
+  @keyframes burst{0%{transform:translate(0,0) scale(0);opacity:1;}
+    100%{transform:translate(var(--dx),var(--dy)) scale(1.5);opacity:0;}}
+
+  /* Final */
+  #final{display:none;width:100%;max-width:580px;text-align:center;}
+  .final-card{background:var(--white);border-radius:26px;padding:38px 26px;
+    box-shadow:0 10px 38px rgba(13,148,136,0.16);}
+  .final-trophy{font-size:4.8rem;margin-bottom:8px;}
+  .final-title{font-size:2.1rem;font-weight:900;color:var(--teal);margin-bottom:6px;}
+  .final-stars{font-size:2.3rem;margin:8px 0;}
+  .final-score{font-size:3.4rem;font-weight:900;color:var(--orange);margin:8px 0;}
+  .final-msg{font-size:1.05rem;font-weight:700;color:#6B7280;margin-bottom:22px;}
+  .replay-btn{background:linear-gradient(135deg,var(--yellow),#F59E0B);
+    color:var(--dark);border:none;border-radius:15px;padding:15px 34px;
+    font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:900;cursor:pointer;
+    box-shadow:0 4px 14px rgba(252,211,77,0.5);transition:transform 0.15s ease;}
+  .replay-btn:hover{transform:scale(1.05);}
+</style>
+</head>
+<body>
+
+<div class="star" style="top:7%;left:4%;animation-delay:0s">⭐</div>
+<div class="star" style="top:14%;right:7%;animation-delay:1s">❤️</div>
+<div class="star" style="top:58%;left:2%;animation-delay:2s">🌟</div>
+<div class="star" style="top:72%;right:4%;animation-delay:0.5s">⭐</div>
+<div class="star" style="top:38%;right:2%;animation-delay:1.5s">❤️</div>
+
+<div class="deco-bar">🎉 ⭐ ❤️ ⭐ 🎉 ⭐ ❤️</div>
+
+<header>
+  <h1>❤️ J'aime...!</h1>
+  <p>Dis ce que tu aimes en français!</p>
+</header>
+
+<div class="hud">
+  <div class="hud-pill">⭐ Score : <strong id="score">0</strong></div>
+  <div class="hud-pill">❓ <strong id="qnum">1</strong> / <strong id="qtot">10</strong></div>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+
+<div class="model-box">
+  📌 J'aime ___.  •  Je n'aime pas ___.  •  Mon/Ma ___ préféré(e) est ___.
+</div>
+
+<div id="game">
+  <div class="card">
+    <div class="scene">
+      <div class="avatar" id="avatar">🧒</div>
+      <div class="bubble" id="bubble">...</div>
+    </div>
+    <div class="q-label">👇 Choisis la bonne réponse :</div>
+    <div class="options" id="opts"></div>
+    <div class="feedback" id="fb"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQ()">Suivant ➡️</button>
+  </div>
+</div>
+
+<div id="final">
+  <div class="final-card">
+    <div class="final-trophy" id="ftrophy">🏆</div>
+    <div class="final-title">Bravo!</div>
+    <div class="final-stars" id="fstars">⭐⭐⭐</div>
+    <div class="final-score" id="fscore">0/10</div>
+    <div class="final-msg" id="fmsg">Tu sais dire ce que tu aimes!</div>
+    <button class="replay-btn" onclick="restart()">🔄 Rejouer!</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  // ── BLOC 1 : J'aime ___ ─────────────────────────────────────
+  {
+    avatar:"🧒", bubble:"« ___ la pizza! »",
+    blank:"J'aime", opts:["Je n'aime pas","J'aime","Il aime"], ans:1,
+    good:"✅ Bravo! J'AIME = I like / I love!",
+    bad:"❌ Pour dire qu'on aime : J'AIME!"
+  },
+  {
+    avatar:"👧", bubble:"« J'aime ___ football. »",
+    blank:"le", opts:["la","les","le"], ans:2,
+    good:"✅ Parfait! Football est masculin → LE football!",
+    bad:"❌ Football est masculin → J'aime LE football!"
+  },
+  {
+    avatar:"👦", bubble:"« J'aime ___ musique. »",
+    blank:"la", opts:["le","la","les"], ans:1,
+    good:"✅ Super! Musique est féminin → LA musique!",
+    bad:"❌ Musique est féminin → J'aime LA musique!"
+  },
+  {
+    avatar:"🧒", bubble:"« J'aime ___ animaux. »",
+    blank:"les", opts:["les","la","le"], ans:0,
+    good:"✅ Excellent! Animaux est pluriel → LES animaux!",
+    bad:"❌ Animaux est pluriel → J'aime LES animaux!"
+  },
+  // ── BLOC 2 : Je n'aime pas ___ ──────────────────────────────
+  {
+    avatar:"👧", bubble:"« Je ___ aime pas les épinards. »",
+    blank:"n'", opts:["ne","n'","pas"], ans:1,
+    good:"✅ Bravo! Je N'aime PAS = I don't like!",
+    bad:"❌ Devant une voyelle : Je N'aime pas!"
+  },
+  {
+    avatar:"👦", bubble:"« Je ne ___ pas les devoirs! »",
+    blank:"aime", opts:["aimes","aimez","aime"], ans:2,
+    good:"✅ Super! Je ne + AIME + pas → forme de base!",
+    bad:"❌ Avec JE, on dit AIME (pas aimes ou aimez)!"
+  },
+  // ── BLOC 3 : Mon/Ma préféré(e) ──────────────────────────────
+  {
+    avatar:"🧒", bubble:"« ___ sport préféré est le soccer. »",
+    blank:"Mon", opts:["Ma","Mon","Mes"], ans:1,
+    good:"✅ Parfait! Sport est masculin → MON sport!",
+    bad:"❌ Sport est masculin → MON sport préféré!"
+  },
+  {
+    avatar:"👧", bubble:"« ___ couleur préférée est le bleu. »",
+    blank:"Ma", opts:["Mon","Ma","Mes"], ans:1,
+    good:"✅ Excellent! Couleur est féminin → MA couleur!",
+    bad:"❌ Couleur est féminin → MA couleur préférée!"
+  },
+  // ── BLOC 4 : Combinaison ────────────────────────────────────
+  {
+    avatar:"👦", bubble:"« J'aime le hockey. Mon sport préféré ___ le hockey. »",
+    blank:"est", opts:["a","ont","est"], ans:2,
+    good:"✅ Bravo! Mon sport préféré EST le hockey!",
+    bad:"❌ On dit EST (= is)! Mon sport préféré EST!"
+  },
+  {
+    avatar:"🧒", bubble:"« Je ___ aime pas les maths, mais j'aime le français! »",
+    blank:"n'", opts:["ne","n'","pas"], ans:1,
+    good:"✅ MAGNIFIQUE! Tu combines deux phrases! 🎉",
+    bad:"❌ Devant une voyelle : Je N'aime pas! Essaie encore!"
+  },
+];
+
+let cur=0, score=0, answered=false;
+const LETTERS=['A','B','C'];
+
+function loadQ(){
+  answered=false;
+  const q=questions[cur];
+  document.getElementById('qnum').textContent=cur+1;
+  document.getElementById('qtot').textContent=questions.length;
+  document.getElementById('prog').style.width=(cur/questions.length*100)+'%';
+  document.getElementById('avatar').textContent=q.avatar;
+  document.getElementById('bubble').innerHTML=q.bubble.replace(q.blank,`<span class="blank">___</span>`);
+  const optsEl=document.getElementById('opts');
+  optsEl.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    btn.innerHTML=`<span class="opt-letter">${LETTERS[i]}</span>${opt}`;
+    btn.onclick=()=>checkAns(i);
+    optsEl.appendChild(btn);
+  });
+  const fb=document.getElementById('fb');
+  fb.className='feedback'; fb.textContent='';
+  document.getElementById('nextBtn').classList.remove('show');
+}
+
+function checkAns(chosen){
+  if(answered)return;
+  answered=true;
+  const q=questions[cur];
+  const btns=document.querySelectorAll('.opt-btn');
+  btns.forEach(b=>b.disabled=true);
+  const fb=document.getElementById('fb');
+  if(chosen===q.ans){
+    score++;
+    document.getElementById('score').textContent=score;
+    btns[chosen].classList.add('correct');
+    fb.className='feedback good'; fb.textContent=q.good;
+    spawnStars();
+  } else {
+    btns[chosen].classList.add('wrong');
+    btns[q.ans].classList.add('correct');
+    fb.className='feedback bad'; fb.textContent=q.bad;
+  }
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function spawnStars(){
+  ['⭐','❤️','🌟'].forEach((s,i)=>{
+    const el=document.createElement('div');
+    el.className='star-burst'; el.textContent=s;
+    const angle=(i*120+Math.random()*40)*Math.PI/180;
+    const dist=80+Math.random()*60;
+    el.style.setProperty('--dx',Math.cos(angle)*dist+'px');
+    el.style.setProperty('--dy',Math.sin(angle)*dist-60+'px');
+    el.style.left=(40+Math.random()*60)+'%'; el.style.top='50%';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1000);
+  });
+}
+
+function nextQ(){
+  cur++;
+  if(cur>=questions.length) showFinal();
+  else loadQ();
+}
+
+function showFinal(){
+  document.getElementById('game').style.display='none';
+  document.getElementById('final').style.display='block';
+  document.getElementById('prog').style.width='100%';
+  const pct=score/questions.length;
+  document.getElementById('fscore').textContent=`${score} / ${questions.length}`;
+  let trophy,stars,msg;
+  if(pct>=0.9){trophy='🏆';stars='⭐⭐⭐';msg='Tu es une SUPERSTAR du français! Incroyable!';}
+  else if(pct>=0.7){trophy='🎉';stars='⭐⭐';msg='Très bien! Tu sais dire ce que tu aimes!';}
+  else{trophy='💪';stars='⭐';msg='Continue à pratiquer! Tu vas y arriver!';}
+  document.getElementById('ftrophy').textContent=trophy;
+  document.getElementById('fstars').textContent=stars;
+  document.getElementById('fmsg').textContent=msg;
+}
+
+function restart(){
+  cur=0;score=0;answered=false;
+  document.getElementById('score').textContent=0;
+  document.getElementById('game').style.display='block';
+  document.getElementById('final').style.display='none';
+  loadQ();
+}
+
+loadQ();
+</script>
+</body>
+</html>
