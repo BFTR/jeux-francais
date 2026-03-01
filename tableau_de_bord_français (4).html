@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎒 L'Excursion en Famille — Tableau de Bord</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1a6fb5;
+    --blue-dark: #0d4a85;
+    --blue-light: #e8f4fd;
+    --orange: #f07d1a;
+    --orange-light: #fff3e0;
+    --green: #2e9b5e;
+    --green-light: #e8f8ef;
+    --purple: #7c3aed;
+    --purple-light: #f3eeff;
+    --yellow: #f5c518;
+    --red: #e03c3c;
+    --white: #ffffff;
+    --bg: #f0f6ff;
+    --card: #ffffff;
+    --text: #1a2340;
+    --shadow: 0 8px 32px rgba(26,111,181,0.13);
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ===== TOP NAV ===== */
+  .top-nav {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue) 100%);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(13,74,133,0.35);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .nav-tab {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.25);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .nav-tab:hover { background: rgba(255,255,255,0.28); transform: translateY(-1px); }
+  .nav-tab.active { background: white; color: var(--blue-dark); border-color: white; }
+
+  /* ===== PANELS ===== */
+  .panel { display: none; padding: 28px; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== HOME PANEL ===== */
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .home-hero {
+    text-align: center;
+    padding: 32px 20px 24px;
+    max-width: 700px;
+    margin: 0 auto 32px;
+  }
+  .home-hero h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--blue-dark);
+    line-height: 1.2;
+  }
+  .home-hero p { color: #556; font-size: 1.1rem; margin-top: 10px; }
+  .game-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 22px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .game-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--accent, var(--blue));
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .game-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(26,111,181,0.2); border-color: var(--accent, var(--blue)); }
+  .game-card .icon { font-size: 3.2rem; margin-bottom: 12px; }
+  .game-card h3 { font-family: 'Baloo 2', cursive; font-size: 1.2rem; color: var(--blue-dark); margin-bottom: 6px; }
+  .game-card p { font-size: 0.85rem; color: #778; line-height: 1.4; }
+  .game-card .lesson-tag {
+    display: inline-block;
+    background: var(--accent-light, var(--blue-light));
+    color: var(--accent, var(--blue));
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 3px solid var(--blue-light);
+  }
+  .section-header .icon { font-size: 2rem; }
+  .section-header h2 { font-family: 'Baloo 2', cursive; font-size: 1.8rem; color: var(--blue-dark); }
+  .section-header p { color: #667; font-size: 0.95rem; }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,111,181,0.35); }
+  .btn-orange { background: var(--orange); color: white; }
+  .btn-orange:hover { background: #d96b0a; transform: translateY(-2px); }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #237a4a; transform: translateY(-2px); }
+  .btn-outline { background: white; color: var(--blue); border: 2px solid var(--blue); }
+  .btn-outline:hover { background: var(--blue-light); }
+  .btn-sm { padding: 8px 16px; font-size: 0.875rem; }
+
+  /* ===== ROUE DES NOMS ===== */
+  .wheel-container {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .wheel-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .canvas-wrap {
+    position: relative;
+    width: 360px; height: 360px;
+  }
+  #wheelCanvas { border-radius: 50%; }
+  .wheel-pointer {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 22px; height: 22px;
+    background: white;
+    border-radius: 50%;
+    border: 4px solid #333;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .wheel-arrow {
+    position: absolute;
+    top: -18px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    z-index: 10;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  .winner-banner {
+    background: linear-gradient(135deg, var(--yellow), var(--orange));
+    color: white;
+    padding: 14px 28px;
+    border-radius: var(--radius);
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    box-shadow: var(--shadow);
+    min-height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%;
+    transition: all 0.4s;
+  }
+  .wheel-sidebar {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .wheel-sidebar h3 { font-family: 'Baloo 2', cursive; color: var(--blue-dark); margin-bottom: 16px; font-size: 1.2rem; }
+  .names-list {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-bottom: 16px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .name-chip {
+    background: var(--blue-light);
+    color: var(--blue-dark);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .name-chip .remove { cursor: pointer; color: var(--red); font-size: 1rem; }
+  .name-chip.absent { background: #ffeeee; color: #999; text-decoration: line-through; }
+  .add-name-row { display: flex; gap: 8px; margin-top: 12px; }
+  .name-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 2px solid #dde;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .name-input:focus { outline: none; border-color: var(--blue); }
+
+  /* ===== DRAG & DROP ===== */
+  .dnd-scene {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .dnd-toolbar {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 24px; align-items: center;
+  }
+  .level-btn {
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 2px solid var(--blue);
+    background: white;
+    color: var(--blue);
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+  }
+  .level-btn.active { background: var(--blue); color: white; }
+  .dnd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .dnd-sources {
+    background: white;
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .dnd-targets {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .drag-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--blue-light);
+    border: 3px solid var(--blue);
+    border-radius: 14px;
+    padding: 12px 16px;
+    cursor: grab;
+    transition: all 0.2s;
+    user-select: none;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  .drag-item:active { cursor: grabbing; opacity: 0.7; }
+  .drag-item.dragging { opacity: 0.4; }
+  .drag-item .item-emoji { font-size: 1.8rem; }
+  .drop-zone {
+    background: white;
+    border: 3px dashed #bcd;
+    border-radius: 14px;
+    padding: 14px 16px;
+    min-height: 80px;
+    transition: all 0.2s;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .drop-zone.dragover { background: var(--blue-light); border-color: var(--blue); border-style: solid; }
+  .drop-zone.correct { border-color: var(--green); background: var(--green-light); }
+  .drop-zone.wrong { border-color: var(--red); background: #ffeeee; }
+  .drop-zone-label {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--blue-dark);
+  }
+  .drop-zone-label .big-emoji { font-size: 2rem; }
+  .dropped-item {
+    background: var(--blue-light);
+    border: 2px solid var(--blue);
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+    justify-content: space-between;
+  }
+  .dropped-item.correct { background: var(--green-light); border-color: var(--green); }
+  .dropped-item.wrong { background: #ffeeee; border-color: var(--red); }
+  .dropped-item .undo-btn { cursor: pointer; color: #999; font-size: 1rem; }
+  .score-bar {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+  .score-display { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: var(--blue-dark); }
+  .stars { font-size: 1.5rem; }
+
+  /* ===== QUIZ ===== */
+  .quiz-scene { max-width: 860px; margin: 0 auto; }
+  .quiz-header-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: white; border-radius: var(--radius);
+    padding: 16px 24px; margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+  .quiz-progress { font-family: 'Baloo 2', cursive; color: var(--blue-dark); font-size: 1.1rem; }
+  .timer-circle {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: conic-gradient(var(--orange) calc(var(--p, 100) * 1%), #eee 0);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--blue-dark);
+    position: relative;
+  }
+  .timer-inner {
+    width: 44px; height: 44px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--blue-dark);
+  }
+  .quiz-question {
+    background: white; border-radius: var(--radius);
+    padding: 32px; text-align: center;
+    margin-bottom: 24px; box-shadow: var(--shadow);
+  }
+  .quiz-question .q-emoji { font-size: 4rem; margin-bottom: 12px; }
+  .quiz-question h2 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.7rem; color: var(--blue-dark);
+  }
+  .quiz-question .q-structure {
+    display: inline-block; background: var(--blue-light);
+    color: var(--blue); font-weight: 700;
+    padding: 6px 16px; border-radius: 20px;
+    margin-top: 8px; font-size: 0.95rem;
+  }
+  .quiz-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .quiz-choice {
+    background: white; border: 3px solid #dde;
+    border-radius: 16px; padding: 18px;
+    cursor: pointer; transition: all 0.2s;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .quiz-choice .c-emoji { font-size: 2.4rem; }
+  .quiz-choice:hover { border-color: var(--blue); background: var(--blue-light); transform: translateY(-2px); }
+  .quiz-choice.selected-correct { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .quiz-choice.selected-wrong { border-color: var(--red); background: #ffeeee; color: var(--red); }
+  .quiz-choice.reveal-correct { border-color: var(--green); background: var(--green-light); animation: pulse-green 0.5s ease; }
+  @keyframes pulse-green { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+  .quiz-feedback {
+    text-align: center; padding: 16px;
+    border-radius: var(--radius); font-family: 'Baloo 2', cursive;
+    font-size: 1.3rem; font-weight: 800;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; animation: fadeIn 0.3s ease; }
+  .quiz-feedback.correct { background: var(--green-light); color: var(--green); }
+  .quiz-feedback.wrong { background: #ffeeee; color: var(--red); }
+
+  /* ===== MEMORY — FORMAT GRAND GROUPE TBI ===== */
+  .memory-scene { max-width: 1000px; margin: 0 auto; }
+  .mem-teams-bar {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 12px; align-items: center; margin-bottom: 18px;
+  }
+  .mem-team {
+    border-radius: 18px; padding: 14px 18px;
+    text-align: center; transition: box-shadow 0.25s, transform 0.2s;
+  }
+  .mem-team.active-turn { box-shadow: 0 0 0 4px currentColor, 0 4px 20px rgba(0,0,0,0.18); transform: scale(1.03); }
+  .mem-team-a { background: #FFF0F3; border: 3px solid #E03c5A; color: #A0253A; }
+  .mem-team-b { background: #F0F6FF; border: 3px solid var(--blue); color: var(--blue-dark); }
+  .mem-team-name { font-family: 'Baloo 2', cursive; font-size: 1.2rem; font-weight: 800; }
+  .mem-team-score { font-family: 'Baloo 2', cursive; font-size: 3rem; line-height: 1; }
+  .mem-team-pts { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; opacity: 0.7; }
+  .mem-turn-badge {
+    background: var(--blue-dark); color: white;
+    border-radius: 50px; padding: 10px 18px;
+    text-align: center; font-weight: 800; font-size: 0.9rem;
+    min-width: 120px;
+  }
+  .mem-bonus-alert {
+    background: linear-gradient(135deg, #F5C518, #F07D1A);
+    border-radius: 16px; padding: 14px 20px;
+    margin-bottom: 14px; text-align: center;
+    display: none; animation: pop 0.35s cubic-bezier(.3,1.5,.5,1);
+  }
+  .mem-bonus-alert.show { display: block; }
+  .mem-bonus-alert h3 { color: white; font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
+  .mem-bonus-alert p { color: rgba(255,255,255,0.9); font-size: 1rem; }
+  .mem-bonus-input { margin-top: 10px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .mem-bonus-input button { padding: 8px 22px; border: none; border-radius: 50px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; cursor: pointer; transition: transform 0.15s; }
+  .mem-bonus-input button:active { transform: scale(0.95); }
+  .mem-btn-yes { background: #2e9b5e; color: white; }
+  .mem-btn-no  { background: rgba(255,255,255,0.35); color: white; }
+  .memory-grid { display: grid; gap: 14px; }
+  .memory-card { aspect-ratio: 1; cursor: pointer; perspective: 700px; min-height: 100px; }
+  .memory-card-inner {
+    width: 100%; height: 100%;
+    position: relative;
+    transition: transform 0.45s cubic-bezier(.4,.2,.2,1);
+    transform-style: preserve-3d;
+  }
+  .memory-card.flipped .memory-card-inner { transform: rotateY(180deg); }
+  .memory-card.matched .memory-card-inner { transform: rotateY(180deg); }
+  .memory-card-front, .memory-card-back {
+    position: absolute; width: 100%; height: 100%;
+    backface-visibility: hidden; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center; font-size: 2rem;
+  }
+  .memory-card-front {
+    background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+    border: 3px solid rgba(255,255,255,0.3);
+    color: white; font-size: 2rem;
+  }
+  .memory-card-back {
+    transform: rotateY(180deg);
+    background: white; border: 3px solid var(--blue-light);
+    box-shadow: 0 4px 16px rgba(26,111,181,0.12);
+    flex-direction: column; gap: 6px; text-align: center; padding: 8px;
+  }
+  .memory-card.matched .memory-card-back { border-color: var(--green); background: var(--green-light); }
+  .memory-card-back .card-emoji { font-size: 2.4rem; }
+  .memory-card-back .card-word { font-size: 0.95rem; font-weight: 800; color: var(--blue-dark); line-height: 1.2; }
+  .memory-difficulty { display: flex; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+  .mem-victory { display: none; text-align: center; background: linear-gradient(135deg, #2e9b5e, #1a6fb5); border-radius: 20px; padding: 32px; color: white; margin-top: 16px; animation: pop 0.4s cubic-bezier(.3,1.5,.5,1); }
+  .mem-victory.show { display: block; }
+  .mem-victory h2 { font-size: 2.2rem; margin-bottom: 8px; }
+  .mem-victory p { font-size: 1.1rem; opacity: 0.9; margin-bottom: 16px; }
+  @keyframes pop { from { opacity:0; transform: scale(0.7); } to { opacity:1; transform: scale(1); } }
+
+  /* ===== WORD WHEEL (Roue de la fortune) ===== */
+  .wordwheel-scene { max-width: 900px; margin: 0 auto; }
+  .wordwheel-word {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    margin: 24px 0;
+  }
+  .letter-box {
+    width: 56px; height: 64px;
+    border-bottom: 4px solid var(--blue);
+    display: flex; align-items: flex-end; justify-content: center;
+    font-family: 'Baloo 2', cursive;
+    font-size: 2rem; font-weight: 800;
+    color: var(--blue-dark);
+    padding-bottom: 4px;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .letter-box.revealed { animation: popIn 0.3s ease; }
+  @keyframes popIn { 0%{transform:scale(0.5)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+  .letter-box.wrong-guess { background: #ffeeee; border-radius: 8px 8px 0 0; }
+  .keyboard {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .key-btn {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    border: 2px solid var(--blue);
+    background: white;
+    color: var(--blue-dark);
+    font-family: 'Baloo 2', cursive;
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .key-btn:hover { background: var(--blue-light); }
+  .key-btn.used-correct { background: var(--green); border-color: var(--green); color: white; }
+  .key-btn.used-wrong { background: #ddd; border-color: #ccc; color: #999; cursor: not-allowed; }
+  .hangman-display {
+    display: flex; align-items: center; justify-content: center;
+    gap: 8px;
+    font-size: 2.5rem;
+    margin: 12px 0;
+  }
+  .hangman-heart { transition: all 0.3s; }
+  .hangman-heart.lost { opacity: 0.2; filter: grayscale(1); }
+  .ww-hint {
+    background: var(--orange-light);
+    border: 2px solid var(--orange);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin: 16px 0;
+    font-weight: 700;
+    color: #7a4000;
+    display: flex; gap: 10px; align-items: center;
+    font-size: 1.05rem;
+  }
+  .ww-category {
+    background: var(--purple-light);
+    border: 2px solid var(--purple);
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin: 8px 0;
+    font-weight: 700;
+    color: var(--purple);
+    display: flex; gap: 10px; align-items: center;
+  }
+  .ww-image {
+    font-size: 5rem; text-align: center;
+    margin: 16px 0;
+  }
+  .ww-end-banner {
+    text-align: center;
+    padding: 32px;
+    border-radius: var(--radius);
+    margin-top: 16px;
+    display: none;
+  }
+  .ww-end-banner.show { display: block; animation: fadeIn 0.5s ease; }
+  .ww-end-banner h2 { font-family: 'Baloo 2', cursive; font-size: 2rem; }
+
+  /* ===== CONFETTI ===== */
+  .confetti-piece {
+    position: fixed;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 9999;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #bcd; border-radius: 4px; }
+
+  @media(max-width: 700px) {
+    .wheel-container { grid-template-columns: 1fr; }
+    .dnd-grid { grid-template-columns: 1fr; }
+    .quiz-choices { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-title">🎒 L'Excursion en Famille</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPanel('home')">🏠 Accueil</button>
+    <button class="nav-tab" onclick="showPanel('wheel')">🎡 Roue des noms</button>
+    <button class="nav-tab" onclick="showPanel('dnd')">🌤️ Glisser-déposer</button>
+    <button class="nav-tab" onclick="showPanel('quiz')">⚡ Quiz</button>
+    <button class="nav-tab" onclick="showPanel('memory')">🧠 Mémoire</button>
+    <button class="nav-tab" onclick="showPanel('wordwheel')">🔤 Deviner le mot</button>
+  </div>
+</nav>
+
+<!-- ===== HOME ===== -->
+<div class="panel active" id="panel-home">
+  <div class="home-hero">
+    <h1>🎒 Tableau de bord numérique</h1>
+    <p>1re année — Extended French &nbsp;|&nbsp; Thème : Préférences, vêtements et nourriture</p>
+  </div>
+  <div class="home-grid">
+    <div class="game-card" style="--accent:#1a6fb5;--accent-light:#e8f4fd" onclick="showPanel('wheel')">
+      <div class="lesson-tag">Toutes les leçons</div>
+      <div class="icon">🎡</div>
+      <h3>Roue des noms</h3>
+      <p>Sélectionner un(e) élève au hasard pour répondre ou présenter</p>
+    </div>
+    <div class="game-card" style="--accent:#f07d1a;--accent-light:#fff3e0" onclick="showPanel('dnd')">
+      <div class="lesson-tag">Leçons 4 & 5</div>
+      <div class="icon">🌤️</div>
+      <h3>Vêtements & Météo</h3>
+      <p>Glisser-déposer les bons vêtements selon le temps qu'il fait</p>
+    </div>
+    <div class="game-card" style="--accent:#e03c3c;--accent-light:#ffeeee" onclick="showPanel('quiz')">
+      <div class="lesson-tag">Leçons 3, 4 & 6</div>
+      <div class="icon">⚡</div>
+      <h3>Quiz éclair</h3>
+      <p>Questions visuelles avec timer — nourriture, vêtements, activités</p>
+    </div>
+    <div class="game-card" style="--accent:#2e9b5e;--accent-light:#e8f8ef" onclick="showPanel('memory')">
+      <div class="lesson-tag">Leçons 1, 3 & 5</div>
+      <div class="icon">🧠</div>
+      <h3>Jeu de mémoire</h3>
+      <p>Associer l'image et le mot — nourriture, activités et équipement</p>
+    </div>
+    <div class="game-card" style="--accent:#7c3aed;--accent-light:#f3eeff" onclick="showPanel('wordwheel')">
+      <div class="lesson-tag">Toutes les leçons</div>
+      <div class="icon">🔤</div>
+      <h3>Deviner le mot</h3>
+      <p>Devine le mot caché grâce aux indices visuels — phonétique intégrée</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ROUE DES NOMS ===== -->
+<div class="panel" id="panel-wheel">
+  <div class="section-header">
+    <div class="icon">🎡</div>
+    <div>
+      <h2>Roue des noms</h2>
+      <p>Mode Classe entière ou Mode 2 équipes pour le jeu de mémoire</p>
+    </div>
+  </div>
+
+  <!-- Mode switcher -->
+  <div style="display:flex;gap:10px;justify-content:center;margin-bottom:20px;flex-wrap:wrap">
+    <button class="level-btn active" id="wheelModeClass" onclick="setWheelMode('class',this)">🏫 Classe entière</button>
+    <button class="level-btn" id="wheelModeTeams" onclick="setWheelMode('teams',this)">⚔️ Mode 2 équipes</button>
+  </div>
+
+  <!-- MODE CLASSE ENTIÈRE -->
+  <div id="wheelClassMode">
+    <div class="wheel-container">
+      <div class="wheel-wrap">
+        <div class="canvas-wrap">
+          <div class="wheel-arrow">▼</div>
+          <canvas id="wheelCanvas" width="360" height="360"></canvas>
+        </div>
+        <div class="winner-banner" id="winnerBanner">🎯 Tourne la roue !</div>
+        <div id="winnerConfirm" style="display:none;text-align:center;margin-top:6px;padding:10px 18px;background:#e8f4fd;border-radius:12px;font-size:1.1rem;font-weight:800;color:#0D3B66"></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
+          <button class="btn btn-primary" onclick="spinWheel()">🎡 Tourner !</button>
+          <button class="btn btn-outline" onclick="markAbsent()">❌ Absent(e)</button>
+          <button class="btn btn-green" onclick="resetWheel()">🔄 Réinitialiser</button>
+        </div>
+      </div>
+      <div class="wheel-sidebar">
+        <h3>👥 Liste des élèves</h3>
+        <div class="names-list" id="namesList"></div>
+        <div class="add-name-row">
+          <input class="name-input" id="newNameInput" placeholder="Ajouter un nom..." onkeydown="if(event.key==='Enter')addName()">
+          <button class="btn btn-primary btn-sm" onclick="addName()">+</button>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="resetAbsent()">✅ Tous présents</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE 2 ÉQUIPES -->
+  <div id="wheelTeamsMode" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px;margin:0 auto">
+
+      <!-- ÉQUIPE A -->
+      <div style="background:#FFF0F3;border:3px solid #E03c5A;border-radius:20px;padding:18px;text-align:center">
+        <div style="font-size:1.3rem;font-weight:800;color:#A0253A;margin-bottom:10px">🔴 Équipe A</div>
+        <div class="canvas-wrap" style="position:relative;display:inline-block">
+          <div style="position:absolute;top:-2px;left:50%;transform:translateX(-50%);font-size:1.4rem;z-index:10">▼</div>
+          <canvas id="wheelCanvasA" width="280" height="280"></canvas>
+        </div>
+        <div id="winnerBannerA" style="margin:10px 0 6px;font-size:1.2rem;font-weight:800;color:#A0253A;min-height:2rem;padding:8px 12px;background:white;border-radius:10px;border:2px solid #E8AAB8">
+          🎯 Tourne !
+        </div>
+        <div id="winnerConfirmA" style="display:none;margin-bottom:8px;padding:8px 12px;background:#FFE8EC;border-radius:10px;font-size:1rem;font-weight:800;color:#A0253A;border:2px solid #E03c5A"></div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-sm" style="background:#E03c5A;color:white;border:none" onclick="spinWheelTeam('A')">🎡 Tourner !</button>
+          <button class="btn btn-outline btn-sm" onclick="markAbsentTeam('A')">❌ Absent(e)</button>
+        </div>
+      </div>
+
+      <!-- ÉQUIPE B -->
+      <div style="background:#F0F6FF;border:3px solid #1A6FB5;border-radius:20px;padding:18px;text-align:center">
+        <div style="font-size:1.3rem;font-weight:800;color:#0D3B66;margin-bottom:10px">🔵 Équipe B</div>
+        <div class="canvas-wrap" style="position:relative;display:inline-block">
+          <div style="position:absolute;top:-2px;left:50%;transform:translateX(-50%);font-size:1.4rem;z-index:10">▼</div>
+          <canvas id="wheelCanvasB" width="280" height="280"></canvas>
+        </div>
+        <div id="winnerBannerB" style="margin:10px 0 6px;font-size:1.2rem;font-weight:800;color:#0D3B66;min-height:2rem;padding:8px 12px;background:white;border-radius:10px;border:2px solid #A8C8E8">
+          🎯 Tourne !
+        </div>
+        <div id="winnerConfirmB" style="display:none;margin-bottom:8px;padding:8px 12px;background:#E0EEFF;border-radius:10px;font-size:1rem;font-weight:800;color:#0D3B66;border:2px solid #1A6FB5"></div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-sm" style="background:#1A6FB5;color:white;border:none" onclick="spinWheelTeam('B')">🎡 Tourner !</button>
+          <button class="btn btn-outline btn-sm" onclick="markAbsentTeam('B')">❌ Absent(e)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gestion des deux listes -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px;margin:20px auto 0">
+      <div>
+        <h4 style="color:#A0253A;margin-bottom:8px;font-size:0.95rem">👥 Élèves Équipe A</h4>
+        <div class="names-list" id="namesListA" style="max-height:160px"></div>
+        <div class="add-name-row" style="margin-top:8px">
+          <input class="name-input" id="newNameInputA" placeholder="Ajouter..." onkeydown="if(event.key==='Enter')addNameTeam('A')">
+          <button class="btn btn-sm" style="background:#E03c5A;color:white;border:none" onclick="addNameTeam('A')">+</button>
+        </div>
+      </div>
+      <div>
+        <h4 style="color:#0D3B66;margin-bottom:8px;font-size:0.95rem">👥 Élèves Équipe B</h4>
+        <div class="names-list" id="namesListB" style="max-height:160px"></div>
+        <div class="add-name-row" style="margin-top:8px">
+          <input class="name-input" id="newNameInputB" placeholder="Ajouter..." onkeydown="if(event.key==='Enter')addNameTeam('B')">
+          <button class="btn btn-sm" style="background:#1A6FB5;color:white;border:none" onclick="addNameTeam('B')">+</button>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <button class="btn btn-green btn-sm" onclick="autoSplitTeams()">🔀 Répartir automatiquement</button>
+      <button class="btn btn-outline btn-sm" onclick="resetTeamWheels()">🔄 Réinitialiser</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DRAG & DROP ===== -->
+<div class="panel" id="panel-dnd">
+  <div class="section-header">
+    <div class="icon">🌤️</div>
+    <div>
+      <h2>Vêtements & Météo</h2>
+      <p>Glisse le bon vêtement dans la bonne météo !</p>
+    </div>
+  </div>
+  <div class="dnd-scene">
+    <div class="score-bar">
+      <div class="score-display" id="dndScore">⭐ Score : 0 / 0</div>
+      <div class="stars" id="dndStars"></div>
+      <div style="display:flex;gap:10px">
+        <div class="dnd-toolbar" style="margin:0">
+          <button class="level-btn active" onclick="setDndLevel('hiver')">❄️ Hiver</button>
+          <button class="level-btn" onclick="setDndLevel('ete')">☀️ Été</button>
+          <button class="level-btn" onclick="setDndLevel('mixte')">🌈 Mixte</button>
+        </div>
+        <button class="btn btn-orange btn-sm" onclick="initDnd()">🔄 Nouveau</button>
+        <button class="btn btn-green btn-sm" onclick="checkDnd()">✅ Vérifier</button>
+      </div>
+    </div>
+    <div class="dnd-grid">
+      <div class="dnd-sources">
+        <h3 style="font-family:'Baloo 2',cursive;color:var(--blue-dark);margin-bottom:16px">👗 Vêtements à trier</h3>
+        <div id="dndItems"></div>
+      </div>
+      <div class="dnd-targets" id="dndTargets"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="panel" id="panel-quiz">
+  <div class="section-header">
+    <div class="icon">⚡</div>
+    <div>
+      <h2>Quiz éclair</h2>
+      <p>Réponds le plus vite possible !</p>
+    </div>
+  </div>
+  <div class="quiz-scene">
+    <div id="quizStart" style="text-align:center;padding:40px">
+      <div style="font-size:5rem;margin-bottom:16px">🎯</div>
+      <h2 style="font-family:'Baloo 2',cursive;font-size:2rem;color:var(--blue-dark);margin-bottom:12px">Prêt pour le quiz ?</h2>
+      <p style="color:#667;margin-bottom:28px">10 questions sur la nourriture, les vêtements et les activités</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="startQuiz('nourriture')">🍎 Nourriture</button>
+        <button class="btn btn-orange" onclick="startQuiz('vetements')">🧥 Vêtements</button>
+        <button class="btn btn-green" onclick="startQuiz('activites')">⛺ Activités</button>
+        <button class="btn btn-outline" onclick="startQuiz('mixte')">🌈 Tout !</button>
+      </div>
+    </div>
+    <div id="quizGame" style="display:none">
+      <div class="quiz-header-bar">
+        <div class="quiz-progress" id="quizProgress">Question 1 / 10</div>
+        <div id="quizScoreDisplay" style="font-family:'Baloo 2',cursive;font-size:1.2rem;color:var(--green)">✅ 0</div>
+        <div class="timer-circle">
+          <div class="timer-inner" id="timerDisplay">10</div>
+        </div>
+      </div>
+      <div class="quiz-question" id="quizQuestion">
+        <div class="q-emoji" id="quizEmoji">🍎</div>
+        <h2 id="quizQText">Qu'est-ce que c'est ?</h2>
+        <div class="q-structure" id="quizStructure"></div>
+      </div>
+      <div class="quiz-choices" id="quizChoices"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="btn btn-outline btn-sm" onclick="showPanel('quiz');document.getElementById('quizStart').style.display='block';document.getElementById('quizGame').style.display='none'">🔙 Quitter</button>
+      </div>
+    </div>
+    <div id="quizEnd" style="display:none;text-align:center;padding:40px">
+      <div style="font-size:5rem;margin-bottom:12px" id="quizEndEmoji">🎉</div>
+      <h2 style="font-family:'Baloo 2',cursive;font-size:2.2rem;color:var(--blue-dark);margin-bottom:8px">Bravo !</h2>
+      <p id="quizEndText" style="font-size:1.2rem;color:#556;margin-bottom:24px"></p>
+      <button class="btn btn-primary" onclick="showPanel('quiz');document.getElementById('quizStart').style.display='block';document.getElementById('quizEnd').style.display='none'">🔄 Rejouer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MEMORY ===== -->
+<div class="panel" id="panel-memory">
+  <div class="section-header">
+    <div class="icon">🧠</div>
+    <div>
+      <h2>Jeu de mémoire — Grand groupe TBI</h2>
+      <p>2 équipes • Un élève vient au tableau • Phrase bonus = 2 points !</p>
+    </div>
+  </div>
+  <div class="memory-scene">
+
+    <!-- Catégorie + niveau -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+      <span style="font-weight:800;color:#556;font-size:0.85rem;text-transform:uppercase">Catégorie :</span>
+      <span id="memCatBtns" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="level-btn active" onclick="setMemCat('nourriture',this)">🍎 Nourriture</button>
+        <button class="level-btn" onclick="setMemCat('vetements',this)">🧥 Vêtements</button>
+        <button class="level-btn" onclick="setMemCat('activites',this)">⛺ Activités</button>
+      </span>
+      <span style="font-weight:800;color:#556;font-size:0.85rem;text-transform:uppercase;margin-left:10px">Paires :</span>
+      <span id="memPairsBtns" style="display:flex;gap:8px">
+        <button class="level-btn active" onclick="setMemPairs(4,this)">4 paires</button>
+        <button class="level-btn" onclick="setMemPairs(6,this)">6 paires</button>
+      </span>
+      <button class="btn btn-orange btn-sm" onclick="initMemory()" style="margin-left:auto">🔄 Nouvelle partie</button>
+    </div>
+
+    <!-- Scores équipes -->
+    <div class="mem-teams-bar">
+      <div class="mem-team mem-team-a active-turn" id="memTeamA">
+        <div class="mem-team-name">🔴 Équipe A</div>
+        <div class="mem-team-score" id="scoreA">0</div>
+        <div class="mem-team-pts">points</div>
+      </div>
+      <div class="mem-turn-badge" id="memTurnBadge">Tour de<br><strong id="memTurnTeam">Équipe A 🔴</strong></div>
+      <div class="mem-team mem-team-b" id="memTeamB">
+        <div class="mem-team-name">🔵 Équipe B</div>
+        <div class="mem-team-score" id="scoreB">0</div>
+        <div class="mem-team-pts">points</div>
+      </div>
+    </div>
+
+    <!-- Alerte bonus phrase -->
+    <div class="mem-bonus-alert" id="memBonusAlert">
+      <h3>⭐ Paire trouvée ! Bonus phrase = +1 point supplémentaire !</h3>
+      <p id="memBonusPrompt">Dis la phrase complète : <strong id="memBonusPhrase"></strong></p>
+      <div class="mem-bonus-input">
+        <button class="mem-btn-yes" onclick="grantBonus(true)">✅ Phrase dite ! (+1 bonus)</button>
+        <button class="mem-btn-no" onclick="grantBonus(false)">➡️ Passer (sans bonus)</button>
+      </div>
+    </div>
+
+    <!-- Grille -->
+    <div class="memory-grid" id="memoryGrid" style="grid-template-columns:repeat(4,1fr)"></div>
+
+    <!-- Victoire -->
+    <div class="mem-victory" id="memVictory">
+      <div style="font-size:3rem;margin-bottom:8px">🎉</div>
+      <h2 id="memVictoryTitle">Bravo tout le monde !</h2>
+      <p id="memVictoryMsg"></p>
+      <button class="btn btn-primary" onclick="initMemory()">🔄 Rejouer</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== DEVINER LE MOT ===== -->
+<div class="panel" id="panel-wordwheel">
+  <div class="section-header">
+    <div class="icon">🔤</div>
+    <div>
+      <h2>Deviner le mot</h2>
+      <p>Devine le mot caché lettre par lettre !</p>
+    </div>
+  </div>
+  <div class="wordwheel-scene">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+      <button class="level-btn active" onclick="setWwCategory('nourriture')">🍎 Nourriture</button>
+      <button class="level-btn" onclick="setWwCategory('vetements')">🧥 Vêtements</button>
+      <button class="level-btn" onclick="setWwCategory('activites')">⛺ Activités</button>
+      <button class="level-btn" onclick="setWwCategory('tout')">🌈 Tout</button>
+      <button class="btn btn-orange btn-sm" onclick="newWwWord()">🔄 Nouveau mot</button>
+    </div>
+    <div class="ww-category" id="wwCategory">📚 Catégorie : Nourriture</div>
+    <div class="ww-image" id="wwImage">🍎</div>
+    <div class="ww-hint" id="wwHint">💬 Indice : <span id="wwHintText">J'aime manger...</span></div>
+    <div class="hangman-display" id="hangmanHearts"></div>
+    <div class="wordwheel-word" id="wwLetterBoxes"></div>
+    <div class="keyboard" id="wwKeyboard"></div>
+    <div class="ww-end-banner" id="wwEndBanner">
+      <div style="font-size:3rem" id="wwEndEmoji">🎉</div>
+      <h2 id="wwEndTitle">Bravo !</h2>
+      <p id="wwEndMsg" style="margin:8px 0 20px;font-size:1.1rem;color:#556"></p>
+      <button class="btn btn-primary" onclick="newWwWord()">➡️ Mot suivant</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// UTILITY
+// ============================================================
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const idx = ['home','wheel','dnd','quiz','memory','wordwheel'].indexOf(id);
+  if(idx>=0) tabs[idx].classList.add('active');
+}
+
+function confetti(x, y) {
+  const colors = ['#f07d1a','#1a6fb5','#2e9b5e','#f5c518','#e03c3c','#7c3aed'];
+  for(let i=0;i<28;i++){
+    const el = document.createElement('div');
+    el.className='confetti-piece';
+    el.style.left = (x + (Math.random()-0.5)*200) + 'px';
+    el.style.top = (y - 40) + 'px';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.width = (8+Math.random()*8)+'px';
+    el.style.height = (8+Math.random()*8)+'px';
+    el.style.animationDuration = (0.8+Math.random()*1.2)+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 2200);
+  }
+}
+
+// ============================================================
+// ROUE DES NOMS — Classe entière + 2 équipes
+// ============================================================
+
+// ── Data ──
+let students = ['Amara','Baptiste','Camille','Diego','Élise','Farid','Gabrielle','Hugo','Inès','Julien','Kenza','Liam','Maëlle','Nathan','Olivia','Pierre','Rania','Samuel'];
+let studentsA = [], studentsB = [];
+let absentStudents = new Set(), absentA = new Set(), absentB = new Set();
+let isSpinning = false, isSpinningA = false, isSpinningB = false;
+let wheelAngle = 0, wheelAngleA = 0, wheelAngleB = 0;
+let currentWinner = null, currentWinnerA = null, currentWinnerB = null;
+
+const WHEEL_COLORS = ['#1a6fb5','#f07d1a','#2e9b5e','#e03c3c','#7c3aed','#f5c518','#00bcd4','#ff5722','#4caf50','#9c27b0','#e91e63','#009688','#ff9800','#673ab7','#03a9f4'];
+
+// ── Mode switch ──
+function setWheelMode(mode, btn) {
+  document.querySelectorAll('#wheelModeClass,#wheelModeTeams').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('wheelClassMode').style.display = mode === 'class' ? '' : 'none';
+  document.getElementById('wheelTeamsMode').style.display = mode === 'teams' ? '' : 'none';
+  if (mode === 'teams') {
+    if (studentsA.length === 0) autoSplitTeams();
+    else { drawWheelTeam('A'); drawWheelTeam('B'); }
+  }
+}
+
+// ── Core canvas draw ──
+// Slice i starts at: baseAngle + i*slice  (where baseAngle already includes -PI/2)
+// Pointer is at TOP of canvas (12 o'clock)
+function drawWheelOnCanvas(canvasId, list, angle) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W/2, cy = H/2, r = cx - 8;
+  ctx.clearRect(0, 0, W, H);
+  if (list.length === 0) return;
+
+  const n = list.length;
+  const sliceAngle = (2 * Math.PI) / n;
+
+  // Shadow backing circle
+  ctx.save();
+  ctx.shadowColor = 'rgba(26,111,181,0.18)';
+  ctx.shadowBlur = 14;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2*Math.PI);
+  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.restore();
+
+  list.forEach((name, i) => {
+    // Slice i: from angle-PI/2 + i*slice to angle-PI/2 + (i+1)*slice
+    const start = angle - Math.PI/2 + i * sliceAngle;
+    const end   = start + sliceAngle;
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = WHEEL_COLORS[i % WHEEL_COLORS.length];
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // Label
+    const mid = start + sliceAngle / 2;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(mid);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'white';
+    const fs = n > 14 ? 11 : n > 9 ? 13 : 15;
+    ctx.font = `bold ${fs}px 'Nunito', sans-serif`;
+    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur = 3;
+    ctx.fillText(name, r - 10, 5);
+    ctx.restore();
+  });
+
+  // Center hub
+  ctx.beginPath(); ctx.arc(cx, cy, 20, 0, 2*Math.PI);
+  ctx.fillStyle = 'white'; ctx.fill();
+  ctx.strokeStyle = '#444'; ctx.lineWidth = 4; ctx.stroke();
+}
+
+// ── Winner resolution — matches draw exactly ──
+// Slice i occupies angles [angle - PI/2 + i*slice, angle - PI/2 + (i+1)*slice]
+// Pointer is at top = angle 0 in canvas (12 o'clock direction)
+// We need: which slice contains angle = -PI/2 (top of canvas relative to origin)
+// Equivalent: which i satisfies  angle - PI/2 + i*slice <= -PI/2 < angle - PI/2 + (i+1)*slice
+// => i*slice <= -angle < (i+1)*slice
+// => i = floor( (-angle mod 2PI) / slice )
+function resolveWinner(list, finalAngle) {
+  if (!list.length) return null;
+  const n = list.length;
+  const sliceAngle = (2 * Math.PI) / n;
+  // normalise -angle into [0, 2PI)
+  const norm = ((-finalAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+  const idx = Math.floor(norm / sliceAngle) % n;
+  return list[idx];
+}
+
+// ── Generic spin engine ──
+function spinEngine(startAngle, onFrame, onEnd) {
+  const extra = (6 + Math.random() * 4) * 2 * Math.PI;
+  const target = startAngle + extra;
+  const duration = 3000 + Math.random() * 1200;
+  const t0 = performance.now();
+  function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+  function step(now) {
+    const t = Math.min((now - t0) / duration, 1);
+    const cur = startAngle + (target - startAngle) * easeOut(t);
+    onFrame(cur);
+    if (t < 1) requestAnimationFrame(step);
+    else onEnd(target);
+  }
+  requestAnimationFrame(step);
+}
+
+// ── Classe entière ──
+function drawWheel(a) { drawWheelOnCanvas('wheelCanvas', students.filter(s => !absentStudents.has(s)), a !== undefined ? a : wheelAngle); }
+
+function spinWheel() {
+  if (isSpinning) return;
+  const active = students.filter(s => !absentStudents.has(s));
+  if (!active.length) return;
+  isSpinning = true;
+  document.getElementById('winnerBanner').textContent = '🎡 …';
+  document.getElementById('winnerConfirm').style.display = 'none';
+  spinEngine(wheelAngle,
+    (a) => { wheelAngle = a; drawWheel(a); },
+    (final) => {
+      wheelAngle = final;
+      isSpinning = false;
+      const winner = resolveWinner(active, final);
+      currentWinner = winner;
+      document.getElementById('winnerBanner').textContent = `🌟 ${winner} !`;
+      const box = document.getElementById('winnerConfirm');
+      box.textContent = `👆 C'est au tour de : ${winner}`;
+      box.style.display = 'block';
+      confetti(box.getBoundingClientRect().left + box.offsetWidth/2, box.getBoundingClientRect().top);
+    }
+  );
+}
+
+function markAbsent() {
+  if (!currentWinner) return;
+  if (absentStudents.has(currentWinner)) absentStudents.delete(currentWinner);
+  else absentStudents.add(currentWinner);
+  renderNamesList(); drawWheel();
+}
+function resetAbsent() { absentStudents.clear(); renderNamesList(); drawWheel(); }
+function resetWheel() {
+  absentStudents.clear(); currentWinner = null;
+  renderNamesList();
+  document.getElementById('winnerBanner').textContent = '🎯 Tourne la roue !';
+  document.getElementById('winnerConfirm').style.display = 'none';
+  drawWheel();
+}
+function renderNamesList() {
+  const el = document.getElementById('namesList');
+  if (!el) return;
+  el.innerHTML = students.map((n,i) => `<div class="name-chip ${absentStudents.has(n)?'absent':''}">${n}<span class="remove" onclick="removeName(${i})">×</span></div>`).join('');
+}
+function addName() {
+  const inp = document.getElementById('newNameInput');
+  const name = inp.value.trim();
+  if (name && !students.includes(name)) { students.push(name); inp.value = ''; renderNamesList(); drawWheel(); }
+}
+function removeName(i) { absentStudents.delete(students[i]); students.splice(i,1); renderNamesList(); drawWheel(); }
+
+// ── 2 équipes ──
+function drawWheelTeam(team) {
+  const list  = (team==='A' ? studentsA : studentsB).filter(s => !(team==='A'?absentA:absentB).has(s));
+  const angle = team==='A' ? wheelAngleA : wheelAngleB;
+  drawWheelOnCanvas('wheelCanvas'+team, list, angle);
+}
+
+function spinWheelTeam(team) {
+  if (team==='A' && isSpinningA) return;
+  if (team==='B' && isSpinningB) return;
+  const ab   = team==='A' ? absentA : absentB;
+  const list = (team==='A' ? studentsA : studentsB).filter(s => !ab.has(s));
+  if (!list.length) return;
+  if (team==='A') isSpinningA = true; else isSpinningB = true;
+  const startAngle = team==='A' ? wheelAngleA : wheelAngleB;
+  document.getElementById('winnerBanner'+team).textContent = '🎡 …';
+  document.getElementById('winnerConfirm'+team).style.display = 'none';
+  spinEngine(startAngle,
+    (a) => {
+      if (team==='A') { wheelAngleA = a; drawWheelOnCanvas('wheelCanvasA', list, a); }
+      else            { wheelAngleB = a; drawWheelOnCanvas('wheelCanvasB', list, a); }
+    },
+    (final) => {
+      if (team==='A') { wheelAngleA = final; isSpinningA = false; }
+      else            { wheelAngleB = final; isSpinningB = false; }
+      const winner = resolveWinner(list, final);
+      if (team==='A') currentWinnerA = winner; else currentWinnerB = winner;
+      document.getElementById('winnerBanner'+team).textContent = `🌟 ${winner} !`;
+      const box = document.getElementById('winnerConfirm'+team);
+      box.textContent = `👆 C'est au tour de : ${winner}`;
+      box.style.display = 'block';
+      confetti(box.getBoundingClientRect().left + box.offsetWidth/2, box.getBoundingClientRect().top);
+    }
+  );
+}
+
+function markAbsentTeam(team) {
+  const w = team==='A' ? currentWinnerA : currentWinnerB;
+  if (!w) return;
+  const ab = team==='A' ? absentA : absentB;
+  if (ab.has(w)) ab.delete(w); else ab.add(w);
+  renderNamesListTeam(team); drawWheelTeam(team);
+}
+
+function renderNamesListTeam(team) {
+  const list = team==='A' ? studentsA : studentsB;
+  const ab   = team==='A' ? absentA   : absentB;
+  const el   = document.getElementById('namesList'+team);
+  if (!el) return;
+  el.innerHTML = list.map((n,i) => `<div class="name-chip ${ab.has(n)?'absent':''}">${n}<span class="remove" onclick="removeNameTeam('${team}',${i})">×</span></div>`).join('');
+}
+
+function addNameTeam(team) {
+  const inp  = document.getElementById('newNameInput'+team);
+  const name = inp.value.trim();
+  const list = team==='A' ? studentsA : studentsB;
+  if (name && !list.includes(name)) { list.push(name); inp.value=''; renderNamesListTeam(team); drawWheelTeam(team); }
+}
+
+function removeNameTeam(team, i) {
+  const list = team==='A' ? studentsA : studentsB;
+  const ab   = team==='A' ? absentA   : absentB;
+  ab.delete(list[i]); list.splice(i,1);
+  renderNamesListTeam(team); drawWheelTeam(team);
+}
+
+function autoSplitTeams() {
+  const shuffled = [...students].sort(() => Math.random() - 0.5);
+  const half = Math.ceil(shuffled.length / 2);
+  studentsA = shuffled.slice(0, half);
+  studentsB = shuffled.slice(half);
+  absentA.clear(); absentB.clear();
+  currentWinnerA = null; currentWinnerB = null;
+  wheelAngleA = 0; wheelAngleB = 0;
+  ['A','B'].forEach(t => {
+    const banner = document.getElementById('winnerBanner'+t);
+    const confirm = document.getElementById('winnerConfirm'+t);
+    if (banner) banner.textContent = '🎯 Tourne !';
+    if (confirm) confirm.style.display = 'none';
+    renderNamesListTeam(t);
+    drawWheelTeam(t);
+  });
+}
+function resetTeamWheels() { autoSplitTeams(); }
+
+// ============================================================
+// MEMORY — FORMAT GRAND GROUPE TBI
+// ============================================================
+
+const memoryVocab = {
+  nourriture: [
+    {id:'pomme',    emoji:'🍎', word:'une pomme',     phrase:"J'aime manger une pomme."},
+    {id:'banane',   emoji:'🍌', word:'une banane',    phrase:"J'aime manger une banane."},
+    {id:'carotte',  emoji:'🥕', word:'une carotte',   phrase:"J'aime manger une carotte."},
+    {id:'sandwich', emoji:'🥪', word:'un sandwich',   phrase:"J'aime manger un sandwich."},
+    {id:'orange',   emoji:'🍊', word:'une orange',    phrase:"J'aime manger une orange."},
+    {id:'brocoli',  emoji:'🥦', word:'du brocoli',    phrase:"J'aime manger du brocoli."},
+    {id:'fraise',   emoji:'🍓', word:'une fraise',    phrase:"J'aime manger une fraise."},
+    {id:'fromage',  emoji:'🧀', word:'du fromage',    phrase:"J'aime manger du fromage."},
+  ],
+  vetements: [
+    {id:'manteau',  emoji:'🧥', word:'un manteau',    phrase:"En hiver, je porte un manteau."},
+    {id:'tuque',    emoji:'🎩', word:'une tuque',     phrase:"Je porte une tuque."},
+    {id:'mitaines', emoji:'🧤', word:'des mitaines',  phrase:"Je porte des mitaines."},
+    {id:'bottes',   emoji:'👢', word:'des bottes',    phrase:"Je porte des bottes."},
+    {id:'foulard',  emoji:'🧣', word:'un foulard',    phrase:"Je porte un foulard."},
+    {id:'chapeau',  emoji:'👒', word:'un chapeau',    phrase:"En été, je porte un chapeau."},
+  ],
+  activites: [
+    {id:'camping',   emoji:'⛺', word:'du camping',    phrase:"J'aime faire du camping."},
+    {id:'velo',      emoji:'🚴', word:'du vélo',       phrase:"J'aime faire du vélo."},
+    {id:'natation',  emoji:'🏊', word:'de la natation',phrase:"J'aime faire de la natation."},
+    {id:'randonnee', emoji:'🥾', word:'de la randonnée',phrase:"J'aime faire de la randonnée."},
+    {id:'peche',     emoji:'🎣', word:'de la pêche',   phrase:"J'aime faire de la pêche."},
+    {id:'piquenique',emoji:'🧺', word:'un pique-nique',phrase:"Nous faisons un pique-nique."},
+  ]
+};
+
+let memCat = 'nourriture';
+let memPairsCount = 4;          // number of PAIRS (4 → 8 cards, 6 → 12 cards)
+let memFlipped = [];
+let memMatched = new Set();
+let memLocked = false;
+let memScoreA = 0, memScoreB = 0;
+let memCurrentTeam = 'A';
+
+// Called by category buttons — changes category AND restarts game
+function setMemCat(cat, btn) {
+  memCat = cat;
+  document.querySelectorAll('#memCatBtns .level-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  initMemory();   // ← restart immediately with new category
+}
+
+// Called by pair-count buttons — changes count AND restarts game
+function setMemPairs(n, btn) {
+  memPairsCount = n;
+  document.querySelectorAll('#memPairsBtns .level-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  initMemory();   // ← restart immediately with new count
+}
+
+function initMemory() {
+  memFlipped = []; memMatched = new Set(); memLocked = false;
+  memScoreA = 0; memScoreB = 0; memCurrentTeam = 'A';
+  document.getElementById('scoreA').textContent = '0';
+  document.getElementById('scoreB').textContent = '0';
+  document.getElementById('memVictory').classList.remove('show');
+  document.getElementById('memBonusAlert').classList.remove('show');
+  updateTurnDisplay();
+
+  const pool    = memoryVocab[memCat];
+  const count   = Math.min(memPairsCount, Math.floor(pool.length));
+  const chosen  = [...pool].sort(() => Math.random() - 0.5).slice(0, count);
+  const cols    = count <= 4 ? 4 : 4;   // always 4 columns
+  document.getElementById('memoryGrid').style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  const cards = [];
+  chosen.forEach(item => {
+    cards.push({uid: item.id+'_img',  pairId: item.id, type:'emoji', item});
+    cards.push({uid: item.id+'_word', pairId: item.id, type:'word',  item});
+  });
+  cards.sort(() => Math.random() - 0.5);
+
+  document.getElementById('memoryGrid').innerHTML = cards.map(c => `
+    <div class="memory-card" id="mc-${c.uid}" onclick="flipCard('${c.uid}','${c.pairId}','${c.type}')">
+      <div class="memory-card-inner">
+        <div class="memory-card-front">?</div>
+        <div class="memory-card-back">
+          ${c.type === 'emoji'
+            ? `<div class="card-emoji">${c.item.emoji}</div>`
+            : `<div class="card-word">${c.item.word}</div>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function updateTurnDisplay() {
+  const name = memCurrentTeam === 'A' ? 'Équipe A 🔴' : 'Équipe B 🔵';
+  document.getElementById('memTurnTeam').textContent = name;
+  document.getElementById('memTeamA').classList.toggle('active-turn', memCurrentTeam === 'A');
+  document.getElementById('memTeamB').classList.toggle('active-turn', memCurrentTeam === 'B');
+}
+
+function flipCard(uid, pairId, type) {
+  if (memLocked) return;
+  if (memMatched.has(pairId)) return;
+  if (memFlipped.find(f => f.uid === uid)) return;
+
+  document.getElementById('mc-'+uid).classList.add('flipped');
+  memFlipped.push({uid, pairId, type});
+
+  if (memFlipped.length === 2) {
+    memLocked = true;
+    const [a, b] = memFlipped;
+    if (a.pairId === b.pairId && a.type !== b.type) {
+      // MATCH
+      memMatched.add(pairId);
+      [a,b].forEach(f => document.getElementById('mc-'+f.uid).classList.add('matched'));
+      memFlipped = [];
+      addScore(memCurrentTeam, 1);
+      confetti(window.innerWidth/2, 200);
+      // Show bonus prompt
+      const item = memoryVocab[memCat].find(i => i.id === pairId);
+      document.getElementById('memBonusPhrase').textContent = `"${item.phrase}"`;
+      document.getElementById('memBonusAlert').classList.add('show');
+      memLocked = false;
+      // note: memLocked stays false — teacher clicks bonus btn manually
+    } else {
+      // NO MATCH — flip back, switch team
+      setTimeout(() => {
+        [a,b].forEach(f => document.getElementById('mc-'+f.uid).classList.remove('flipped'));
+        memFlipped = [];
+        memLocked = false;
+        memCurrentTeam = memCurrentTeam === 'A' ? 'B' : 'A';
+        updateTurnDisplay();
+      }, 1000);
+    }
+  }
+}
+
+function grantBonus(yes) {
+  document.getElementById('memBonusAlert').classList.remove('show');
+  if (yes) { addScore(memCurrentTeam, 1); confetti(window.innerWidth/2, 150); }
+  if (memMatched.size === memPairsCount) { showMemVictory(); return; }
+  // same team keeps playing after a match
+}
+
+function addScore(team, pts) {
+  if (team === 'A') { memScoreA += pts; document.getElementById('scoreA').textContent = memScoreA; }
+  else              { memScoreB += pts; document.getElementById('scoreB').textContent = memScoreB; }
+}
+
+function showMemVictory() {
+  const d = memScoreA - memScoreB;
+  let title, msg;
+  if (d > 0)      { title='🔴 Équipe A gagne !';   msg=`Équipe A ${memScoreA} pts — Équipe B ${memScoreB} pts`; }
+  else if (d < 0) { title='🔵 Équipe B gagne !';   msg=`Équipe B ${memScoreB} pts — Équipe A ${memScoreA} pts`; }
+  else            { title='🤝 Égalité parfaite !'; msg=`Les deux équipes : ${memScoreA} pts`; }
+  document.getElementById('memVictoryTitle').textContent = title;
+  document.getElementById('memVictoryMsg').textContent   = msg;
+  document.getElementById('memVictory').classList.add('show');
+  [200, 600, 1000].forEach(d => setTimeout(() => confetti(window.innerWidth*(0.3+Math.random()*0.4), 200), d));
+}
+
+
+// ============================================================
+// DRAG & DROP
+// ============================================================
+const dndData = {
+  hiver: {
+    zones: [
+      { id: 'z1', label: '❄️ Il fait froid', emoji: '❄️', accepts: ['manteau','tuque','mitaines','bottes','foulard','chandail','pantalon'] },
+      { id: 'z2', label: '🌨️ Il neige', emoji: '🌨️', accepts: ['manteau','tuque','mitaines','bottes','foulard','imperméable'] },
+    ],
+    items: [
+      { id: 'i1', name: 'le manteau', emoji: '🧥', correct: ['z1','z2'] },
+      { id: 'i2', name: 'la tuque', emoji: '🎩', correct: ['z1','z2'] },
+      { id: 'i3', name: 'les mitaines', emoji: '🧤', correct: ['z1','z2'] },
+      { id: 'i4', name: 'les bottes', emoji: '👢', correct: ['z1','z2'] },
+      { id: 'i5', name: 'le foulard', emoji: '🧣', correct: ['z1','z2'] },
+      { id: 'i6', name: 'le short', emoji: '🩳', correct: [] },
+      { id: 'i7', name: 'les sandales', emoji: '👡', correct: [] },
+      { id: 'i8', name: 'le maillot', emoji: '👙', correct: [] },
+    ]
+  },
+  ete: {
+    zones: [
+      { id: 'z1', label: '☀️ Il fait chaud', emoji: '☀️', accepts: ['short','sandales','t-shirt','chapeau','lunettes','maillot'] },
+      { id: 'z2', label: '🌧️ Il pleut', emoji: '🌧️', accepts: ['imperméable','bottes','parapluie','chandail'] },
+    ],
+    items: [
+      { id: 'i1', name: 'le t-shirt', emoji: '👕', correct: ['z1'] },
+      { id: 'i2', name: 'le short', emoji: '🩳', correct: ['z1'] },
+      { id: 'i3', name: 'les sandales', emoji: '👡', correct: ['z1'] },
+      { id: 'i4', name: 'le chapeau', emoji: '👒', correct: ['z1'] },
+      { id: 'i5', name: 'l\'imperméable', emoji: '🌂', correct: ['z2'] },
+      { id: 'i6', name: 'les bottes', emoji: '👢', correct: ['z2'] },
+      { id: 'i7', name: 'le manteau', emoji: '🧥', correct: [] },
+      { id: 'i8', name: 'la tuque', emoji: '🎩', correct: [] },
+    ]
+  },
+  mixte: {
+    zones: [
+      { id: 'z1', label: '❄️ En hiver', emoji: '❄️', accepts: ['manteau','tuque','mitaines','bottes','foulard','chandail'] },
+      { id: 'z2', label: '☀️ En été', emoji: '☀️', accepts: ['short','sandales','t-shirt','chapeau','maillot'] },
+      { id: 'z3', label: '🍂 En automne', emoji: '🍂', accepts: ['imperméable','bottes','chandail','pantalon','foulard'] },
+    ],
+    items: [
+      { id: 'i1', name: 'le manteau', emoji: '🧥', correct: ['z1'] },
+      { id: 'i2', name: 'la tuque', emoji: '🎩', correct: ['z1'] },
+      { id: 'i3', name: 'le short', emoji: '🩳', correct: ['z2'] },
+      { id: 'i4', name: 'le t-shirt', emoji: '👕', correct: ['z2'] },
+      { id: 'i5', name: 'l\'imperméable', emoji: '🌂', correct: ['z3'] },
+      { id: 'i6', name: 'les bottes', emoji: '👢', correct: ['z1','z3'] },
+      { id: 'i7', name: 'les mitaines', emoji: '🧤', correct: ['z1'] },
+      { id: 'i8', name: 'les sandales', emoji: '👡', correct: ['z2'] },
+      { id: 'i9', name: 'le chandail', emoji: '👔', correct: ['z1','z3'] },
+      { id: 'i10', name: 'le chapeau', emoji: '👒', correct: ['z2'] },
+    ]
+  }
+};
+
+let currentDndLevel = 'hiver';
+let dndDropped = {}; // zoneId -> [itemId]
+let draggedItem = null;
+let dndCorrect = 0, dndTotal = 0;
+
+function setDndLevel(level) {
+  currentDndLevel = level;
+  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  initDnd();
+}
+
+function initDnd() {
+  const data = dndData[currentDndLevel];
+  dndDropped = {};
+  data.zones.forEach(z => dndDropped[z.id] = []);
+  dndCorrect = 0; dndTotal = 0;
+  document.getElementById('dndStars').textContent = '';
+  document.getElementById('dndScore').textContent = '⭐ Score : 0 / 0';
+
+  // Render items
+  const shuffled = [...data.items].sort(() => Math.random()-0.5);
+  document.getElementById('dndItems').innerHTML = shuffled.map(item => `
+    <div class="drag-item" id="ditem-${item.id}" draggable="true"
+      ondragstart="dragStart('${item.id}')" ondragend="dragEnd()">
+      <span class="item-emoji">${item.emoji}</span>
+      <span>${item.name}</span>
+    </div>
+  `).join('');
+
+  // Render zones
+  document.getElementById('dndTargets').innerHTML = data.zones.map(zone => `
+    <div class="drop-zone" id="${zone.id}"
+      ondragover="dragOver(event,'${zone.id}')"
+      ondragleave="dragLeave('${zone.id}')"
+      ondrop="dropItem(event,'${zone.id}')">
+      <div class="drop-zone-label">
+        <span class="big-emoji">${zone.emoji}</span>
+        <span>${zone.label}</span>
+      </div>
+      <div id="${zone.id}-drops"></div>
+    </div>
+  `).join('');
+}
+
+function dragStart(itemId) {
+  draggedItem = itemId;
+  setTimeout(()=>{ const el=document.getElementById('ditem-'+itemId); if(el) el.classList.add('dragging'); }, 0);
+}
+function dragEnd() {
+  if(draggedItem) { const el=document.getElementById('ditem-'+draggedItem); if(el) el.classList.remove('dragging'); }
+  draggedItem = null;
+}
+function dragOver(e, zoneId) { e.preventDefault(); document.getElementById(zoneId).classList.add('dragover'); }
+function dragLeave(zoneId) { document.getElementById(zoneId).classList.remove('dragover'); }
+
+function dropItem(e, zoneId) {
+  e.preventDefault();
+  if(!draggedItem) return;
+  const zone = document.getElementById(zoneId);
+  zone.classList.remove('dragover');
+
+  const data = dndData[currentDndLevel];
+  const item = data.items.find(i=>i.id===draggedItem);
+  if(!item) return;
+
+  // Remove from previous zone
+  data.zones.forEach(z => {
+    dndDropped[z.id] = dndDropped[z.id].filter(id=>id!==draggedItem);
+    renderDroppedItems(z.id);
+  });
+
+  // Add to new zone & hide from source
+  dndDropped[zoneId].push(draggedItem);
+  const srcEl = document.getElementById('ditem-'+draggedItem);
+  if(srcEl) srcEl.style.display = 'none';
+  renderDroppedItems(zoneId);
+  draggedItem = null;
+}
+
+function renderDroppedItems(zoneId) {
+  const data = dndData[currentDndLevel];
+  const cont = document.getElementById(zoneId+'-drops');
+  if(!cont) return;
+  cont.innerHTML = dndDropped[zoneId].map(itemId => {
+    const item = data.items.find(i=>i.id===itemId);
+    return `<div class="dropped-item" id="dropped-${zoneId}-${itemId}">
+      <span>${item.emoji} ${item.name}</span>
+      <span class="undo-btn" onclick="undropItem('${zoneId}','${itemId}')">↩</span>
+    </div>`;
+  }).join('');
+}
+
+function undropItem(zoneId, itemId) {
+  dndDropped[zoneId] = dndDropped[zoneId].filter(id=>id!==itemId);
+  renderDroppedItems(zoneId);
+  const srcEl = document.getElementById('ditem-'+itemId);
+  if(srcEl) { srcEl.style.display='flex'; srcEl.classList.remove('dragging'); }
+}
+
+function checkDnd() {
+  const data = dndData[currentDndLevel];
+  dndCorrect = 0; dndTotal = 0;
+  data.zones.forEach(zone => {
+    dndDropped[zone.id].forEach(itemId => {
+      dndTotal++;
+      const item = data.items.find(i=>i.id===itemId);
+      const isCorrect = item.correct.includes(zone.id);
+      if(isCorrect) dndCorrect++;
+      const el = document.getElementById(`dropped-${zone.id}-${itemId}`);
+      if(el) { el.classList.remove('correct','wrong'); el.classList.add(isCorrect?'correct':'wrong'); }
+    });
+  });
+  const stars = dndTotal===0?0:Math.round((dndCorrect/dndTotal)*3);
+  document.getElementById('dndScore').textContent = `⭐ Score : ${dndCorrect} / ${dndTotal}`;
+  document.getElementById('dndStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
+  if(dndCorrect===dndTotal && dndTotal>0) {
+    const bar = document.getElementById('dndScore');
+    confetti(bar.getBoundingClientRect().left+100, bar.getBoundingClientRect().top);
+  }
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+const quizData = {
+  nourriture: [
+    { emoji:'🍎', question:"Qu'est-ce que c'est ?", answer:'une pomme', choices:['une pomme','une carotte','une banane','un raisin'], structure:"C'est..." },
+    { emoji:'🥕', question:"Qu'est-ce que c'est ?", answer:'une carotte', choices:['une tomate','une carotte','une banane','un brocoli'], structure:"C'est..." },
+    { emoji:'🍌', question:"Qu'est-ce que c'est ?", answer:'une banane', choices:['une pomme','un raisin','une banane','une poire'], structure:"C'est..." },
+    { emoji:'🥪', question:"Qu'est-ce qu'il y a dans la boîte à lunch ?", answer:'un sandwich', choices:['un gâteau','un sandwich','une pizza','un hamburger'], structure:"Dans ma boîte à lunch, il y a..." },
+    { emoji:'🍊', question:"Qu'est-ce que c'est ?", answer:'une orange', choices:['une orange','une tomate','une pomme','une pêche'], structure:"C'est..." },
+    { emoji:'🧃', question:"Qu'est-ce qu'il y a dans ta boîte à lunch ?", answer:'un jus', choices:['du lait','un jus','de l\'eau','un yogourt'], structure:"Dans ma boîte à lunch, il y a..." },
+    { emoji:'🥦', question:"Quel légume est-ce ?", answer:'du brocoli', choices:['des carottes','des tomates','du brocoli','de la laitue'], structure:"C'est..." },
+    { emoji:'🍓', question:"Qu'est-ce que c'est ?", answer:'une fraise', choices:['une cerise','une fraise','une framboise','un raisin'], structure:"C'est..." },
+    { emoji:'🧀', question:"Qu'est-ce que tu vois ?", answer:'du fromage', choices:['du pain','du beurre','du fromage','du yogourt'], structure:"C'est..." },
+    { emoji:'🍇', question:"Qu'est-ce que c'est ?", answer:'des raisins', choices:['des cerises','des bleuets','des raisins','des framboises'], structure:"C'est..." },
+  ],
+  vetements: [
+    { emoji:'🧥', question:"Qu'est-ce qu'on porte en hiver ?", answer:'un manteau', choices:['un short','un manteau','un t-shirt','un maillot'], structure:"En hiver, je porte..." },
+    { emoji:'🎩', question:"Qu'est-ce que c'est ?", answer:'une tuque', choices:['un chapeau','une tuque','un casque','un bonnet'], structure:"Je porte..." },
+    { emoji:'🧤', question:"Qu'est-ce qu'on porte quand il fait froid ?", answer:'des mitaines', choices:['des sandales','des mitaines','des gants de cuisine','des bottes'], structure:"Quand il fait froid, je porte..." },
+    { emoji:'🩳', question:"Qu'est-ce qu'on porte en été ?", answer:'un short', choices:['un pantalon','un short','une tuque','un manteau'], structure:"En été, je porte..." },
+    { emoji:'👢', question:"Qu'est-ce qu'on porte quand il neige ?", answer:'des bottes', choices:['des sandales','des souliers','des bottes','des pantoufles'], structure:"Quand il neige, je porte..." },
+    { emoji:'🌂', question:"Qu'est-ce qu'on utilise quand il pleut ?", answer:'un imperméable', choices:['un imperméable','un manteau','une tuque','un foulard'], structure:"Quand il pleut, je porte..." },
+    { emoji:'👒', question:"Qu'est-ce qu'on porte au soleil ?", answer:'un chapeau', choices:['une tuque','un chapeau','un casque','une casquette'], structure:"Au soleil, je porte..." },
+    { emoji:'🧣', question:"Qu'est-ce que c'est ?", answer:'un foulard', choices:['un manteau','un foulard','une ceinture','un sac'], structure:"Je porte..." },
+    { emoji:'👕', question:"Qu'est-ce qu'on porte en été ?", answer:'un t-shirt', choices:['un chandail','un t-shirt','un veston','une chemise'], structure:"En été, je porte..." },
+    { emoji:'👡', question:"Qu'est-ce qu'on porte en été ?", answer:'des sandales', choices:['des bottes','des pantoufles','des sandales','des souliers'], structure:"En été, je porte..." },
+  ],
+  activites: [
+    { emoji:'⛺', question:"Qu'est-ce que la famille fait ?", answer:'du camping', choices:['du camping','du ski','de la natation','du vélo'], structure:"J'aime faire..." },
+    { emoji:'🚴', question:"Quelle activité est-ce ?", answer:'du vélo', choices:['de la course','du vélo','du soccer','de la natation'], structure:"Je veux faire..." },
+    { emoji:'🏊', question:"Quelle activité est-ce ?", answer:'de la natation', choices:['du ski','de la course','de la natation','du vélo'], structure:"J'aime faire..." },
+    { emoji:'🥾', question:"Quelle activité est-ce ?", answer:'de la randonnée', choices:['du camping','de la randonnée','du ski','du jogging'], structure:"Pour l'excursion, je veux faire..." },
+    { emoji:'⛷️', question:"Quelle activité est-ce ?", answer:'du ski', choices:['du ski','de la luge','du patin','de la raquette'], structure:"J'aime faire..." },
+    { emoji:'🎣', question:"Quelle activité est-ce ?", answer:'de la pêche', choices:['de la chasse','de la pêche','du kayak','de la plongée'], structure:"J'aime faire..." },
+    { emoji:'🏕️', question:"Qu'est-ce qu'on fait en famille ?", answer:'un pique-nique', choices:['un pique-nique','un camping','une randonnée','une sortie'], structure:"Nous faisons..." },
+    { emoji:'⚽', question:"Quelle activité est-ce ?", answer:'du soccer', choices:['du soccer','du hockey','du basketball','du tennis'], structure:"J'aime jouer..." },
+    { emoji:'🛶', question:"Quelle activité est-ce ?", answer:'du canot', choices:['du kayak','du bateau','du canot','du surf'], structure:"Pour l'excursion, je veux faire..." },
+    { emoji:'🌱', question:"Quelle activité est-ce ?", answer:'du jardinage', choices:['du jardinage','de la cuisine','du bricolage','de la peinture'], structure:"J'aime faire..." },
+  ]
+};
+
+let quizQuestions = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizTimer = null;
+let quizTimeLeft = 10;
+let quizAnswered = false;
+
+function startQuiz(cat) {
+  let pool = [];
+  if(cat === 'mixte' || cat === 'tout') {
+    pool = [...quizData.nourriture, ...quizData.vetements, ...quizData.activites];
+  } else {
+    pool = [...quizData[cat]];
+  }
+  quizQuestions = pool.sort(()=>Math.random()-0.5).slice(0,10);
+  quizIndex = 0; quizScore = 0;
+  document.getElementById('quizStart').style.display = 'none';
+  document.getElementById('quizEnd').style.display = 'none';
+  document.getElementById('quizGame').style.display = 'block';
+  showQuizQuestion();
+}
+
+function showQuizQuestion() {
+  if(quizIndex >= quizQuestions.length) { endQuiz(); return; }
+  clearInterval(quizTimer);
+  quizAnswered = false;
+  quizTimeLeft = 10;
+  const q = quizQuestions[quizIndex];
+  document.getElementById('quizProgress').textContent = `Question ${quizIndex+1} / ${quizQuestions.length}`;
+  document.getElementById('quizScoreDisplay').textContent = `✅ ${quizScore}`;
+  document.getElementById('quizEmoji').textContent = q.emoji;
+  document.getElementById('quizQText').textContent = q.question;
+  document.getElementById('quizStructure').textContent = q.structure;
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+
+  const shuffled = [...q.choices].sort(()=>Math.random()-0.5);
+  const emojiMap = { 'une pomme':'🍎','une carotte':'🥕','une banane':'🍌','un raisin':'🍇','une tomate':'🍅','une poire':'🍐','une orange':'🍊','un sandwich':'🥪','un gâteau':'🎂','une pizza':'🍕','du brocoli':'🥦','une fraise':'🍓','du fromage':'🧀','des raisins':'🍇','un manteau':'🧥','une tuque':'🎩','des mitaines':'🧤','un short':'🩳','des bottes':'👢','un imperméable':'🌂','un chapeau':'👒','un foulard':'🧣','un t-shirt':'👕','des sandales':'👡','du camping':'⛺','du vélo':'🚴','de la natation':'🏊','de la randonnée':'🥾','du ski':'⛷️','de la pêche':'🎣','un pique-nique':'🏕️','du soccer':'⚽','du canot':'🛶','du jardinage':'🌱','un jus':'🧃','du lait':'🥛','de l\'eau':'💧','un yogourt':'🥛','des carottes':'🥕','des tomates':'🍅','de la laitue':'🥬','une cerise':'🍒','une framboise':'🫐','des cerises':'🍒','des bleuets':'🫐','des framboises':'🫐','du pain':'🍞','du beurre':'🧈' };
+  document.getElementById('quizChoices').innerHTML = shuffled.map(c => `
+    <div class="quiz-choice" onclick="selectAnswer('${c.replace(/'/g,"\\'")}','${q.answer.replace(/'/g,"\\'")}')">
+      <span class="c-emoji">${emojiMap[c]||'❓'}</span>
+      <span>${c}</span>
+    </div>
+  `).join('');
+
+  updateTimer();
+  quizTimer = setInterval(()=>{
+    quizTimeLeft--;
+    updateTimer();
+    if(quizTimeLeft <= 0) { clearInterval(quizTimer); if(!quizAnswered) timeOut(); }
+  }, 1000);
+}
+
+function updateTimer() {
+  const pct = quizTimeLeft * 10;
+  const d = document.getElementById('timerDisplay');
+  d.textContent = quizTimeLeft;
+  d.parentElement.style.setProperty('--p', pct);
+  d.parentElement.style.background = `conic-gradient(${quizTimeLeft>5?'var(--orange)':'var(--red)'} calc(${pct} * 1%), #eee 0)`;
+}
+
+function selectAnswer(chosen, correct) {
+  if(quizAnswered) return;
+  quizAnswered = true;
+  clearInterval(quizTimer);
+  const isCorrect = chosen === correct;
+  if(isCorrect) quizScore++;
+
+  document.querySelectorAll('.quiz-choice').forEach(el => {
+    const txt = el.querySelector('span:last-child').textContent;
+    if(txt === chosen) el.classList.add(isCorrect?'selected-correct':'selected-wrong');
+    if(txt === correct) el.classList.add('reveal-correct');
+    el.style.pointerEvents = 'none';
+  });
+
+  const fb = document.getElementById('quizFeedback');
+  fb.className = 'quiz-feedback show ' + (isCorrect?'correct':'wrong');
+  fb.textContent = isCorrect ? '✅ Bravo ! C\'est correct !' : `❌ La bonne réponse : ${correct}`;
+  if(isCorrect) {
+    const el = document.querySelector('.quiz-choice.selected-correct');
+    if(el) confetti(el.getBoundingClientRect().left+60, el.getBoundingClientRect().top);
+  }
+  document.getElementById('quizScoreDisplay').textContent = `✅ ${quizScore}`;
+  setTimeout(()=>{ quizIndex++; showQuizQuestion(); }, 1800);
+}
+
+function timeOut() {
+  quizAnswered = true;
+  const q = quizQuestions[quizIndex];
+  document.querySelectorAll('.quiz-choice').forEach(el => {
+    if(el.querySelector('span:last-child').textContent === q.answer) el.classList.add('reveal-correct');
+    el.style.pointerEvents = 'none';
+  });
+  const fb = document.getElementById('quizFeedback');
+  fb.className = 'quiz-feedback show wrong';
+  fb.textContent = `⏰ Temps écoulé ! La réponse : ${q.answer}`;
+  setTimeout(()=>{ quizIndex++; showQuizQuestion(); }, 1800);
+}
+
+function endQuiz() {
+  clearInterval(quizTimer);
+  document.getElementById('quizGame').style.display = 'none';
+  document.getElementById('quizEnd').style.display = 'block';
+  const pct = Math.round(quizScore/quizQuestions.length*100);
+  document.getElementById('quizEndEmoji').textContent = pct>=80?'🏆':pct>=50?'🌟':'😊';
+  document.getElementById('quizEndText').textContent = `${quizScore} / ${quizQuestions.length} — ${pct>=80?'Excellent !':pct>=50?'Bien !':'Continue comme ça !'}`;
+  if(pct>=80) confetti(window.innerWidth/2, 200);
+}
+
+// ============================================================
+// DEVINER LE MOT
+// ============================================================
+const wwData = {
+  nourriture: [
+    { word:'POMME', emoji:'🍎', hint:'J\'aime manger...', structure:'C\'est une...' },
+    { word:'BANANE', emoji:'🍌', hint:'C\'est un fruit jaune', structure:'C\'est une...' },
+    { word:'CAROTTE', emoji:'🥕', hint:'C\'est un légume orange', structure:'C\'est une...' },
+    { word:'SANDWICH', emoji:'🥪', hint:'Dans ma boîte à lunch, il y a un...', structure:'Il y a un...' },
+    { word:'ORANGE', emoji:'🍊', hint:'C\'est un fruit rond et orange', structure:'C\'est une...' },
+    { word:'BROCOLI', emoji:'🥦', hint:'C\'est un légume vert', structure:'C\'est du...' },
+    { word:'FRAISE', emoji:'🍓', hint:'C\'est un petit fruit rouge', structure:'C\'est une...' },
+  ],
+  vetements: [
+    { word:'MANTEAU', emoji:'🧥', hint:'Je porte ça en hiver pour avoir chaud', structure:'En hiver, je porte un...' },
+    { word:'BOTTES', emoji:'👢', hint:'Je porte ça dans mes pieds quand il neige', structure:'Je porte des...' },
+    { word:'TUQUE', emoji:'🎩', hint:'Je porte ça sur ma tête en hiver', structure:'Je porte une...' },
+    { word:'MITAINES', emoji:'🧤', hint:'Je porte ça dans mes mains quand il fait froid', structure:'Je porte des...' },
+    { word:'FOULARD', emoji:'🧣', hint:'Je porte ça autour de mon cou', structure:'Je porte un...' },
+    { word:'CHAPEAU', emoji:'👒', hint:'Je porte ça sur ma tête en été', structure:'En été, je porte un...' },
+  ],
+  activites: [
+    { word:'CAMPING', emoji:'⛺', hint:'On dort dans une tente en famille', structure:'J\'aime faire du...' },
+    { word:'RANDONNEE', emoji:'🥾', hint:'On marche dans la forêt', structure:'Je veux faire de la...' },
+    { word:'NATATION', emoji:'🏊', hint:'On nage dans l\'eau', structure:'J\'aime faire de la...' },
+    { word:'PIQUE-NIQUE', emoji:'🧺', hint:'On mange dehors dans un parc', structure:'Nous faisons un...' },
+    { word:'VELO', emoji:'🚴', hint:'On pédale sur deux roues', structure:'J\'aime faire du...' },
+  ]
+};
+
+let wwCategory = 'nourriture';
+let wwCurrentWord = null;
+let wwGuessed = new Set();
+let wwWrong = 0;
+const WW_MAX_WRONG = 6;
+
+function setWwCategory(cat) {
+  wwCategory = cat;
+  document.querySelectorAll('.wordwheel-scene .level-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  newWwWord();
+}
+
+function getWwPool() {
+  if(wwCategory === 'tout') return [...wwData.nourriture,...wwData.vetements,...wwData.activites];
+  return wwData[wwCategory] || wwData.nourriture;
+}
+
+function newWwWord() {
+  const pool = getWwPool();
+  wwCurrentWord = pool[Math.floor(Math.random()*pool.length)];
+  wwGuessed = new Set();
+  wwWrong = 0;
+  document.getElementById('wwEndBanner').classList.remove('show');
+  renderWw();
+}
+
+function renderWw() {
+  const w = wwCurrentWord;
+  document.getElementById('wwImage').textContent = w.emoji;
+  document.getElementById('wwHintText').textContent = w.hint;
+  const catLabels = { nourriture:'🍎 Nourriture', vetements:'🧥 Vêtements', activites:'⛺ Activités', tout:'🌈 Tout' };
+  document.getElementById('wwCategory').textContent = `📚 Catégorie : ${catLabels[wwCategory]||'Tout'} &nbsp;|&nbsp; Structure : ${w.structure}`;
+
+  // Hearts
+  let hearts = '';
+  for(let i=0;i<WW_MAX_WRONG;i++) hearts += `<span class="hangman-heart ${i<wwWrong?'lost':''}">❤️</span>`;
+  document.getElementById('hangmanHearts').innerHTML = hearts;
+
+  // Letter boxes
+  const letters = w.word.replace('-','').replace(' ','').split('');
+  const unique = [...new Set(w.word.split(''))].filter(c=>c!=='-'&&c!==' ');
+  const allRevealed = unique.every(c=>wwGuessed.has(c));
+
+  document.getElementById('wwLetterBoxes').innerHTML = w.word.split('').map(c => {
+    if(c==='-'||c===' ') return `<div style="width:20px;display:flex;align-items:flex-end;justify-content:center;font-size:1.5rem;padding-bottom:4px">${c}</div>`;
+    const revealed = wwGuessed.has(c) || allRevealed;
+    return `<div class="letter-box ${revealed?'revealed':''} ${!revealed&&wwWrong>=WW_MAX_WRONG?'wrong-guess':''}">${revealed?c:''}</div>`;
+  }).join('');
+
+  // Keyboard
+  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  document.getElementById('wwKeyboard').innerHTML = alpha.map(c => {
+    const used = wwGuessed.has(c);
+    const correct = used && w.word.includes(c);
+    const wrong = used && !w.word.includes(c);
+    return `<button class="key-btn ${correct?'used-correct':''} ${wrong?'used-wrong':''}"
+      onclick="guessLetter('${c}')" ${used?'disabled':''}>${c}</button>`;
+  }).join('');
+
+  // Check win/lose
+  if(allRevealed) {
+    showWwEnd(true);
+  } else if(wwWrong >= WW_MAX_WRONG) {
+    wwGuessed = new Set(w.word.split(''));
+    renderWw();
+    showWwEnd(false);
+  }
+}
+
+function guessLetter(letter) {
+  if(wwGuessed.has(letter)) return;
+  wwGuessed.add(letter);
+  if(!wwCurrentWord.word.includes(letter)) wwWrong++;
+  renderWw();
+}
+
+function showWwEnd(won) {
+  const banner = document.getElementById('wwEndBanner');
+  banner.style.background = won ? 'linear-gradient(135deg,#e8f8ef,#b8f0cc)' : 'linear-gradient(135deg,#ffeeee,#ffd0d0)';
+  document.getElementById('wwEndEmoji').textContent = won ? '🎉' : '😔';
+  document.getElementById('wwEndTitle').textContent = won ? 'Bravo ! Tu as trouvé !' : 'Presque !';
+  document.getElementById('wwEndMsg').textContent = won
+    ? `Le mot était : ${wwCurrentWord.word} ${wwCurrentWord.emoji}`
+    : `Le mot était : ${wwCurrentWord.word} ${wwCurrentWord.emoji}`;
+  banner.classList.add('show');
+  if(won) confetti(window.innerWidth/2, window.innerHeight/2);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderNamesList();
+  drawWheel();
+  initDnd();
+  initMemory();
+  newWwWord();
+  // Pre-split teams ready in background
+  autoSplitTeams();
+});
+</script>
+</body>
+</html>
