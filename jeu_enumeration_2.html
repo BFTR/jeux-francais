@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission Ordre ! — D'abord, Ensuite, Puis, Finalement</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #1B3A6B 0%, #2E5FA3 50%, #1A7A4A 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    color: #fff;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    margin-bottom: 18px;
+    width: 100%;
+    max-width: 760px;
+  }
+  .header h1 { font-size: 2rem; font-weight: 900; color: #F5C842; text-shadow: 2px 2px 4px rgba(0,0,0,.4); }
+  .header p  { font-size: 1rem; opacity: .85; margin-top: 4px; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap { width: 100%; max-width: 760px; margin-bottom: 12px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: .85rem; opacity: .8; margin-bottom: 4px; }
+  .progress-track { background: rgba(255,255,255,.2); border-radius: 99px; height: 10px; }
+  .progress-fill  { background: #F5C842; border-radius: 99px; height: 10px; transition: width .4s ease; }
+
+  /* ── LEVEL SELECTOR ── */
+  .level-screen {
+    background: rgba(255,255,255,.12);
+    border: 2px solid rgba(255,255,255,.25);
+    border-radius: 20px;
+    padding: 28px 24px;
+    max-width: 760px;
+    width: 100%;
+    text-align: center;
+  }
+  .level-screen h2 { font-size: 1.5rem; margin-bottom: 8px; color: #F5C842; }
+  .level-screen p  { font-size: .95rem; opacity: .8; margin-bottom: 24px; }
+  .level-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  .level-btn {
+    background: rgba(255,255,255,.15);
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 14px;
+    padding: 18px 10px;
+    cursor: pointer;
+    color: #fff;
+    transition: background .2s, transform .15s;
+    font-size: .95rem;
+  }
+  .level-btn:hover { background: rgba(255,255,255,.28); transform: translateY(-2px); }
+  .level-btn .lv-num  { font-size: 2rem; font-weight: 900; color: #F5C842; }
+  .level-btn .lv-name { font-weight: 700; margin: 4px 0; }
+  .level-btn .lv-diff { font-size: .8rem; opacity: .75; }
+  .level-locked { opacity: .4; cursor: not-allowed; }
+  .level-locked:hover { transform: none; }
+  .level-done .lv-num::after { content: ' ✓'; color: #4ade80; }
+
+  /* ── GAME SCREEN ── */
+  .game-screen {
+    background: rgba(255,255,255,.12);
+    border: 2px solid rgba(255,255,255,.25);
+    border-radius: 20px;
+    padding: 22px 20px;
+    max-width: 760px;
+    width: 100%;
+  }
+
+  /* top bar */
+  .game-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .game-level-badge { background: #F5C842; color: #1B3A6B; font-weight: 900; border-radius: 99px; padding: 4px 14px; font-size: .9rem; }
+  .timer-box { background: rgba(255,255,255,.2); border-radius: 99px; padding: 4px 16px; font-size: 1rem; font-weight: 700; }
+  .timer-box.urgent { background: #e53e3e; animation: pulse .6s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+  /* instruction */
+  .instruction {
+    background: rgba(255,255,255,.15);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .instruction strong { color: #F5C842; }
+
+  /* ── WORD BANK ── */
+  .section-label { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; opacity: .7; margin-bottom: 8px; }
+
+  .word-bank { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; min-height: 54px; padding: 10px; background: rgba(0,0,0,.15); border-radius: 12px; }
+
+  .word-chip {
+    background: #fff;
+    color: #1B3A6B;
+    font-weight: 800;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s, opacity .2s;
+    user-select: none;
+    border: 3px solid transparent;
+  }
+  .word-chip:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,.25); }
+  .word-chip.used { opacity: 0; pointer-events: none; }
+
+  /* ── SEQUENCE SLOTS ── */
+  .sequence { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin-bottom: 20px; }
+
+  .slot-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+  .slot-number {
+    width: 32px; height: 32px;
+    background: #F5C842;
+    color: #1B3A6B;
+    font-weight: 900;
+    font-size: 1rem;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .slot {
+    width: 100%;
+    min-height: 58px;
+    border: 3px dashed rgba(255,255,255,.4);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    padding: 8px;
+    text-align: center;
+    background: rgba(0,0,0,.1);
+  }
+  .slot.filled { border: 3px solid #F5C842; background: rgba(245,200,66,.15); color: #F5C842; }
+  .slot.filled:hover { background: rgba(200,50,50,.25); border-color: #fc8181; }
+  .slot.correct { border-color: #4ade80; background: rgba(74,222,128,.2); color: #4ade80; cursor: default; }
+  .slot.wrong   { border-color: #fc8181; background: rgba(252,129,129,.2); animation: shake .4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+  .slot-hint { font-size: .78rem; opacity: .65; text-align: center; max-width: 100%; }
+
+  /* ── SENTENCE PREVIEW ── */
+  .sentence-preview {
+    background: rgba(255,255,255,.18);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    min-height: 56px;
+    color: #fff;
+  }
+  .sentence-preview .filled-word { color: #F5C842; font-weight: 800; }
+  .sentence-preview .blank { color: rgba(255,255,255,.35); font-style: italic; }
+
+  /* ── BUTTONS ── */
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    border: none; border-radius: 10px; padding: 10px 22px; font-weight: 800; font-size: .95rem; cursor: pointer; transition: transform .15s, opacity .2s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-check  { background: #F5C842; color: #1B3A6B; }
+  .btn-reset  { background: rgba(255,255,255,.2); color: #fff; border: 2px solid rgba(255,255,255,.4); }
+  .btn-next   { background: #1A7A4A; color: #fff; }
+  .btn-menu   { background: rgba(255,255,255,.15); color: #fff; border: 2px solid rgba(255,255,255,.35); }
+
+  /* ── FEEDBACK ── */
+  .feedback {
+    border-radius: 14px; padding: 14px 18px; margin-bottom: 14px; font-size: 1rem; font-weight: 700; display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok  { background: rgba(74,222,128,.25); border: 2px solid #4ade80; color: #d1fae5; }
+  .feedback.err { background: rgba(252,129,129,.2); border: 2px solid #fc8181; color: #fee2e2; }
+
+  /* ── SCORE SCREEN ── */
+  .score-screen {
+    background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.25); border-radius: 20px;
+    padding: 36px 24px; max-width: 760px; width: 100%; text-align: center;
+  }
+  .score-screen .big-emoji { font-size: 4rem; margin-bottom: 12px; }
+  .score-screen h2 { font-size: 1.8rem; color: #F5C842; margin-bottom: 8px; }
+  .score-screen .stars { font-size: 2.2rem; margin: 12px 0; }
+  .score-screen p { opacity: .85; margin-bottom: 20px; }
+  .score-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; max-width: 360px; margin-left: auto; margin-right: auto; }
+  .score-stat { background: rgba(255,255,255,.12); border-radius: 12px; padding: 12px; }
+  .score-stat .val { font-size: 1.8rem; font-weight: 900; color: #F5C842; }
+  .score-stat .lbl { font-size: .8rem; opacity: .75; }
+
+  /* ── GESTURE GUIDE ── */
+  .gesture-guide {
+    background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.2); border-radius: 14px;
+    padding: 14px 18px; margin-bottom: 16px;
+  }
+  .gesture-guide h4 { color: #F5C842; font-size: .9rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .05em; }
+  .gesture-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .gesture-item { background: rgba(255,255,255,.12); border-radius: 10px; padding: 8px 14px; font-size: .9rem; }
+  .gesture-item .gw { color: #F5C842; font-weight: 800; }
+
+  /* ── MODE: FILL IN THE BLANK ── */
+  .fitb-sentence { font-size: 1.2rem; line-height: 2; margin-bottom: 16px; }
+  .fitb-sentence .blank-slot {
+    display: inline-block; min-width: 120px; border-bottom: 3px solid #F5C842;
+    text-align: center; font-weight: 800; color: #F5C842; padding: 0 8px; cursor: pointer;
+    vertical-align: bottom;
+  }
+  .fitb-sentence .blank-slot.filled-slot { color: #4ade80; border-color: #4ade80; }
+
+  /* responsive */
+  @media (max-width: 500px) {
+    .header h1 { font-size: 1.5rem; }
+    .sequence { grid-template-columns: repeat(2, 1fr); }
+    .score-detail { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🎯 Mission Ordre !</h1>
+  <p>D'abord • Ensuite • Puis • Finalement</p>
+</div>
+
+<div class="progress-wrap" id="progressWrap" style="display:none">
+  <div class="progress-label">
+    <span id="progressLabel">Niveau 1</span>
+    <span id="progressScore">0 pts</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<!-- SCREENS -->
+<div id="levelScreen"></div>
+<div id="gameScreen" style="display:none"></div>
+<div id="scoreScreen" style="display:none"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+const WORDS = [
+  { word: "D'abord",     emoji: "1️⃣", gesture: "Un doigt levé",      color: "#3B82F6" },
+  { word: "Ensuite",     emoji: "2️⃣", gesture: "Deux doigts levés",  color: "#10B981" },
+  { word: "Puis",        emoji: "3️⃣", gesture: "Trois doigts levés", color: "#F59E0B" },
+  { word: "Finalement",  emoji: "4️⃣", gesture: "Poing fermé",        color: "#EF4444" },
+];
+
+const LEVELS = [
+  {
+    id: 1, name: "La recette de crêpes", emoji: "🥞",
+    diff: "Facile — 4 étapes",
+    mode: "order",
+    steps: [
+      { order: 1, text: "mélange la farine et les œufs",      hint: "D'abord…"     },
+      { order: 2, text: "ajoute le lait dans le bol",          hint: "Ensuite…"     },
+      { order: 3, text: "cuis les crêpes dans la poêle",       hint: "Puis…"        },
+      { order: 4, text: "mange avec du sirop d'érable !",      hint: "Finalement…"  },
+    ]
+  },
+  {
+    id: 2, name: "Se brosser les dents", emoji: "🦷",
+    diff: "Facile — 4 étapes",
+    mode: "order",
+    steps: [
+      { order: 1, text: "mets le dentifrice sur la brosse",   hint: "D'abord…"    },
+      { order: 2, text: "brosse bien toutes les dents",        hint: "Ensuite…"    },
+      { order: 3, text: "rince ta bouche avec de l'eau",       hint: "Puis…"       },
+      { order: 4, text: "range ta brosse à dents",             hint: "Finalement…" },
+    ]
+  },
+  {
+    id: 3, name: "Préparer son sac d'école", emoji: "🎒",
+    diff: "Moyen — 4 étapes + phrase",
+    mode: "fitb",
+    sentence: "_____ je mets mes livres. _____ j'ajoute mes crayons. _____ je ferme le sac. _____ je suis prêt(e) !",
+    answers: ["D'abord", "Ensuite", "Puis", "Finalement"],
+  },
+  {
+    id: 4, name: "Jouer au football", emoji: "⚽",
+    diff: "Moyen — 4 étapes + phrase",
+    mode: "fitb",
+    sentence: "_____ je mets mes souliers. _____ je vais sur le terrain. _____ je joue avec mes amis. _____ je rentre à la maison.",
+    answers: ["D'abord", "Ensuite", "Puis", "Finalement"],
+  },
+  {
+    id: 5, name: "Faire de la peinture", emoji: "🎨",
+    diff: "Difficile — ordre + production",
+    mode: "order",
+    steps: [
+      { order: 1, text: "prépare ton papier et tes pinceaux",  hint: "D'abord…"    },
+      { order: 2, text: "choisis tes couleurs préférées",      hint: "Ensuite…"    },
+      { order: 3, text: "peins ton tableau",                   hint: "Puis…"       },
+      { order: 4, text: "laisse sécher et admire ton œuvre !", hint: "Finalement…" },
+    ],
+    challenge: true,
+  },
+  {
+    id: 6, name: "Aller à la natation", emoji: "🏊",
+    diff: "Difficile — ordre + chronométré",
+    mode: "fitb",
+    sentence: "_____ je mets mon maillot. _____ je marche jusqu'à la piscine. _____ je nage dans l'eau. _____ je me sèche.",
+    answers: ["D'abord", "Ensuite", "Puis", "Finalement"],
+    challenge: true,
+  },
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let state = {
+  screen: "levels",     // "levels" | "game" | "score"
+  levelId: null,
+  completed: JSON.parse(localStorage.getItem("missionOrdre_done") || "[]"),
+  totalScore: parseInt(localStorage.getItem("missionOrdre_score") || "0"),
+  // game state
+  slotAnswers: [],      // for order mode
+  fitbAnswers: [],      // for fitb mode
+  selectedWord: null,
+  checked: false,
+  startTime: null,
+  timerId: null,
+  timeLeft: 0,
+  errors: 0,
+};
+
+function saveProgress() {
+  localStorage.setItem("missionOrdre_done", JSON.stringify(state.completed));
+  localStorage.setItem("missionOrdre_score", String(state.totalScore));
+}
+
+// ═══════════════════════════════════════════
+//  RENDER LEVEL SCREEN
+// ═══════════════════════════════════════════
+function renderLevelScreen() {
+  state.screen = "levels";
+  document.getElementById("progressWrap").style.display = "none";
+  document.getElementById("gameScreen").style.display = "none";
+  document.getElementById("scoreScreen").style.display = "none";
+  document.getElementById("levelScreen").style.display = "";
+
+  const totalDone = state.completed.length;
+  const totalLevels = LEVELS.length;
+
+  document.getElementById("levelScreen").innerHTML = `
+    <div class="level-screen">
+      <h2>🎯 Choisis ton niveau !</h2>
+      <p>Tu as complété <strong>${totalDone} / ${totalLevels}</strong> niveaux • Score total : <strong>${state.totalScore} pts</strong></p>
+      <div class="gesture-guide">
+        <h4>👐 Les gestes à connaître</h4>
+        <div class="gesture-row">
+          ${WORDS.map(w => `<div class="gesture-item"><span class="gw">${w.word}</span> → ${w.emoji} ${w.gesture}</div>`).join("")}
+        </div>
+      </div>
+      <div class="level-grid">
+        ${LEVELS.map((lv, i) => {
+          const done = state.completed.includes(lv.id);
+          const locked = i > 0 && !state.completed.includes(LEVELS[i-1].id);
+          return `
+            <button class="level-btn ${done ? 'level-done' : ''} ${locked ? 'level-locked' : ''}"
+              onclick="${locked ? '' : `startLevel(${lv.id})`}">
+              <div class="lv-num">${lv.emoji}</div>
+              <div class="lv-name">Niveau ${lv.id}</div>
+              <div style="font-size:.95rem;margin:2px 0">${lv.name}</div>
+              <div class="lv-diff">${lv.diff}</div>
+              ${done ? '<div style="color:#4ade80;font-size:.85rem;margin-top:4px">✓ Complété !</div>' : ''}
+              ${locked ? '<div style="font-size:.85rem;margin-top:4px">🔒 Complète le niveau précédent</div>' : ''}
+            </button>`;
+        }).join("")}
+      </div>
+      ${totalDone > 0 ? `<button class="btn btn-reset" style="margin-top:18px" onclick="resetAll()">🔄 Recommencer depuis le début</button>` : ''}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  START LEVEL
+// ═══════════════════════════════════════════
+function startLevel(id) {
+  const lv = LEVELS.find(l => l.id === id);
+  state.levelId = id;
+  state.checked = false;
+  state.errors = 0;
+  state.selectedWord = null;
+  state.screen = "game";
+
+  if (lv.mode === "order") {
+    // shuffle steps
+    state.slotAnswers = Array(lv.steps.length).fill(null);
+    state.shuffled = [...lv.steps].sort(() => Math.random() - .5);
+  } else {
+    state.fitbAnswers = Array(lv.answers.length).fill(null);
+    state.fitbSelected = null;
+  }
+
+  // timer
+  const timeMap = { 1: 90, 2: 85, 3: 75, 4: 70, 5: 65, 6: 60 };
+  state.timeLeft = timeMap[id] || 90;
+  state.startTime = Date.now();
+
+  document.getElementById("levelScreen").style.display = "none";
+  document.getElementById("scoreScreen").style.display = "none";
+  document.getElementById("progressWrap").style.display = "";
+  document.getElementById("gameScreen").style.display = "";
+
+  clearInterval(state.timerId);
+  state.timerId = setInterval(tickTimer, 1000);
+
+  renderGame();
+}
+
+// ═══════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════
+function tickTimer() {
+  state.timeLeft--;
+  const box = document.getElementById("timerBox");
+  if (box) {
+    box.textContent = "⏱ " + state.timeLeft + "s";
+    box.className = "timer-box" + (state.timeLeft <= 10 ? " urgent" : "");
+  }
+  if (state.timeLeft <= 0) {
+    clearInterval(state.timerId);
+    if (!state.checked) autoCheck(true);
+  }
+}
+
+// ═══════════════════════════════════════════
+//  RENDER GAME
+// ═══════════════════════════════════════════
+function renderGame() {
+  const lv = LEVELS.find(l => l.id === state.levelId);
+  const gs = document.getElementById("gameScreen");
+
+  // progress bar
+  const pct = ((state.levelId - 1) / LEVELS.length) * 100;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressLabel").textContent = `Niveau ${lv.id} — ${lv.name}`;
+  document.getElementById("progressScore").textContent = state.totalScore + " pts";
+
+  if (lv.mode === "order") {
+    renderOrderMode(lv, gs);
+  } else {
+    renderFitbMode(lv, gs);
+  }
+}
+
+// ── ORDER MODE ──
+function renderOrderMode(lv, container) {
+  const allPlaced = state.slotAnswers.every(a => a !== null);
+  const bankWords = state.shuffled.filter(step =>
+    !state.slotAnswers.some(a => a && a.order === step.order)
+  );
+
+  container.innerHTML = `
+    <div class="game-screen">
+      <div class="game-top">
+        <span class="game-level-badge">${lv.emoji} Niveau ${lv.id} — ${lv.name}</span>
+        <span class="timer-box" id="timerBox">⏱ ${state.timeLeft}s</span>
+      </div>
+
+      <div class="instruction">
+        <strong>🎯 Mets les étapes dans le bon ordre !</strong><br>
+        Clique d'abord sur une étape, puis clique sur la case où tu veux la mettre.
+      </div>
+
+      <div class="gesture-guide">
+        <h4>👐 Les mots de l'ordre</h4>
+        <div class="gesture-row">
+          ${WORDS.map(w => `<div class="gesture-item"><span class="gw">${w.word}</span> ${w.emoji}</div>`).join("")}
+        </div>
+      </div>
+
+      <div class="section-label">📦 Étapes à placer</div>
+      <div class="word-bank" id="wordBank">
+        ${bankWords.map(step => `
+          <div class="word-chip ${state.selectedWord === step.order ? 'selected' : ''}"
+               style="${state.selectedWord === step.order ? 'border-color:#F5C842;background:#1B3A6B;color:#F5C842;' : ''}"
+               onclick="selectStep(${step.order})">
+            ${step.text}
+          </div>`).join("")}
+        ${bankWords.length === 0 ? '<span style="opacity:.5;font-style:italic;padding:8px">Toutes les étapes sont placées !</span>' : ''}
+      </div>
+
+      <div class="section-label">📋 Séquence</div>
+      <div class="sequence" id="sequenceArea">
+        ${lv.steps.map((_, i) => {
+          const placed = state.slotAnswers[i];
+          const isCorrect = state.checked && placed && placed.order === i + 1;
+          const isWrong   = state.checked && placed && placed.order !== i + 1;
+          return `
+            <div class="slot-wrap">
+              <div class="slot-number">${i + 1}</div>
+              <div class="slot ${placed ? 'filled' : ''} ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}"
+                   onclick="${placed && !state.checked ? `removeFromSlot(${i})` : (state.selectedWord !== null ? `placeInSlot(${i})` : '')}"
+                   id="slot${i}">
+                ${placed ? placed.text : '<span style="opacity:.4;font-size:.85rem">Clique ici</span>'}
+              </div>
+              <div class="slot-hint">${WORDS[i].word}</div>
+            </div>`;
+        }).join("")}
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="btn-row">
+        ${!state.checked && allPlaced ? `<button class="btn btn-check" onclick="checkOrder()">✅ Vérifier !</button>` : ''}
+        ${state.checked ? `<button class="btn btn-next" onclick="nextLevel()">➡ Niveau suivant !</button>` : ''}
+        <button class="btn btn-reset" onclick="startLevel(${state.levelId})">🔄 Recommencer</button>
+        <button class="btn btn-menu" onclick="goMenu()">📋 Menu</button>
+      </div>
+    </div>`;
+}
+
+// ── FITB MODE ──
+function renderFitbMode(lv, container) {
+  const parts = lv.sentence.split("_____");
+  const allPlaced = state.fitbAnswers.every(a => a !== null);
+
+  // Build sentence with blanks — use data-index to avoid apostrophe-in-onclick bug
+  let sentenceHtml = "";
+  for (let i = 0; i < parts.length; i++) {
+    sentenceHtml += `<span>${parts[i]}</span>`;
+    if (i < lv.answers.length) {
+      const ans = state.fitbAnswers[i];
+      const isWrong = state.checked && ans && ans !== lv.answers[i];
+      sentenceHtml += `
+        <span class="blank-slot ${ans ? 'filled-slot' : ''} ${isWrong ? 'wrong-slot' : ''}"
+              style="${isWrong ? 'color:#fc8181;border-color:#fc8181' : ''}"
+              data-blank="${i}">
+          ${ans || '___'}
+        </span>`;
+    }
+  }
+
+  container.innerHTML = `
+    <div class="game-screen">
+      <div class="game-top">
+        <span class="game-level-badge">${lv.emoji} Niveau ${lv.id} — ${lv.name}</span>
+        <span class="timer-box" id="timerBox">⏱ ${state.timeLeft}s</span>
+      </div>
+
+      <div class="instruction">
+        <strong>🎯 Complète la phrase avec les bons mots !</strong><br>
+        Clique sur un mot, puis clique sur le blanc où tu veux le mettre.
+      </div>
+
+      <div class="gesture-guide">
+        <h4>👐 Les mots de l'ordre</h4>
+        <div class="gesture-row">
+          ${WORDS.map(w => `<div class="gesture-item"><span class="gw">${w.word}</span> ${w.emoji}</div>`).join("")}
+        </div>
+      </div>
+
+      <div class="section-label">📦 Mots disponibles</div>
+      <div class="word-bank" id="fitbWordBank">
+        ${WORDS.map(w => {
+          const used = state.fitbAnswers.includes(w.word);
+          const selected = state.fitbSelected === w.word;
+          return `
+            <div class="word-chip ${used ? 'used' : ''}"
+                 style="${selected ? 'border-color:#F5C842;background:#1B3A6B;color:#F5C842;' : ''}"
+                 data-word="${used ? '' : w.word}">
+              ${w.word} ${w.emoji}
+            </div>`;
+        }).join("")}
+      </div>
+
+      <div class="section-label">✏️ La phrase</div>
+      <div class="fitb-sentence" id="fitbSentence">${sentenceHtml}</div>
+
+      <div class="feedback" id="feedback"></div>
+
+      <div class="btn-row">
+        ${!state.checked && allPlaced ? `<button class="btn btn-check" onclick="checkFitb()">✅ Vérifier !</button>` : ''}
+        ${state.checked ? `<button class="btn btn-next" onclick="nextLevel()">➡ Niveau suivant !</button>` : ''}
+        <button class="btn btn-reset" onclick="startLevel(${state.levelId})">🔄 Recommencer</button>
+        <button class="btn btn-menu" onclick="goMenu()">📋 Menu</button>
+      </div>
+    </div>`;
+
+  // Attach click events after render (avoids apostrophe-in-HTML-attribute bug)
+  document.querySelectorAll('#fitbWordBank .word-chip').forEach(el => {
+    const word = el.dataset.word;
+    if (word) {
+      el.addEventListener('click', () => selectFitbWord(word));
+    }
+  });
+  document.querySelectorAll('#fitbSentence .blank-slot').forEach(el => {
+    const idx = parseInt(el.dataset.blank);
+    el.addEventListener('click', () => {
+      if (state.checked) return;
+      if (state.fitbAnswers[idx]) {
+        clearFitb(idx);
+      } else if (state.fitbSelected !== null) {
+        placeFitb(idx);
+      }
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+//  INTERACTIONS — ORDER MODE
+// ═══════════════════════════════════════════
+function selectStep(order) {
+  if (state.checked) return;
+  state.selectedWord = (state.selectedWord === order) ? null : order;
+  renderGame();
+}
+
+function placeInSlot(slotIndex) {
+  if (state.checked || state.selectedWord === null) return;
+  const lv = LEVELS.find(l => l.id === state.levelId);
+  const step = lv.steps.find(s => s.order === state.selectedWord);
+  if (!step) return;
+  // if slot occupied, return placed step to bank
+  if (state.slotAnswers[slotIndex]) {
+    // already handled by removal
+  }
+  state.slotAnswers[slotIndex] = step;
+  state.selectedWord = null;
+  renderGame();
+}
+
+function removeFromSlot(slotIndex) {
+  if (state.checked) return;
+  state.slotAnswers[slotIndex] = null;
+  renderGame();
+}
+
+// ═══════════════════════════════════════════
+//  INTERACTIONS — FITB MODE
+// ═══════════════════════════════════════════
+function selectFitbWord(word) {
+  if (state.checked) return;
+  state.fitbSelected = (state.fitbSelected === word) ? null : word;
+  renderGame();
+}
+
+function placeFitb(index) {
+  if (state.checked || state.fitbSelected === null) return;
+  if (state.fitbAnswers[index]) return; // occupied
+  state.fitbAnswers[index] = state.fitbSelected;
+  state.fitbSelected = null;
+  renderGame();
+}
+
+function clearFitb(index) {
+  if (state.checked) return;
+  state.fitbAnswers[index] = null;
+  renderGame();
+}
+
+// ═══════════════════════════════════════════
+//  CHECK ANSWERS
+// ═══════════════════════════════════════════
+function checkOrder() {
+  clearInterval(state.timerId);
+  state.checked = true;
+  const lv = LEVELS.find(l => l.id === state.levelId);
+  let correct = 0;
+  lv.steps.forEach((step, i) => {
+    if (state.slotAnswers[i] && state.slotAnswers[i].order === step.order) correct++;
+    else state.errors++;
+  });
+
+  const allCorrect = correct === lv.steps.length;
+  showFeedback(allCorrect, correct, lv.steps.length);
+  if (allCorrect) awardPoints();
+  renderGame();
+}
+
+function checkFitb() {
+  clearInterval(state.timerId);
+  state.checked = true;
+  const lv = LEVELS.find(l => l.id === state.levelId);
+  let correct = 0;
+  lv.answers.forEach((ans, i) => {
+    if (state.fitbAnswers[i] === ans) correct++;
+    else state.errors++;
+  });
+
+  const allCorrect = correct === lv.answers.length;
+  showFeedback(allCorrect, correct, lv.answers.length);
+  if (allCorrect) awardPoints();
+  renderGame();
+}
+
+function autoCheck(timeout) {
+  const lv = LEVELS.find(l => l.id === state.levelId);
+  if (lv.mode === "order") checkOrder();
+  else checkFitb();
+}
+
+function showFeedback(allCorrect, correct, total) {
+  const fb = document.getElementById("feedback");
+  if (!fb) return;
+  fb.className = "feedback show " + (allCorrect ? "ok" : "err");
+  const timeBonus = Math.max(0, state.timeLeft);
+  if (allCorrect) {
+    fb.innerHTML = `🎉 Bravo ! ${correct}/${total} bonnes réponses ! (+${calcPoints()} pts avec bonus de temps)`;
+  } else {
+    fb.innerHTML = `😊 ${correct}/${total} bonnes réponses. Essaie encore ou passe au suivant !`;
+  }
+}
+
+function calcPoints() {
+  const base = 100;
+  const timeBonus = Math.floor(state.timeLeft * 1.5);
+  const errorPenalty = state.errors * 10;
+  return Math.max(10, base + timeBonus - errorPenalty);
+}
+
+function awardPoints() {
+  const lv = LEVELS.find(l => l.id === state.levelId);
+  if (!state.completed.includes(lv.id)) {
+    state.completed.push(lv.id);
+    state.totalScore += calcPoints();
+    saveProgress();
+  }
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+function nextLevel() {
+  const nextId = state.levelId + 1;
+  if (nextId <= LEVELS.length) {
+    startLevel(nextId);
+  } else {
+    showScoreScreen();
+  }
+}
+
+function goMenu() {
+  clearInterval(state.timerId);
+  renderLevelScreen();
+}
+
+function resetAll() {
+  if (!confirm("Recommencer depuis le début ? Ton progrès sera effacé.")) return;
+  state.completed = [];
+  state.totalScore = 0;
+  saveProgress();
+  renderLevelScreen();
+}
+
+// ═══════════════════════════════════════════
+//  SCORE SCREEN
+// ═══════════════════════════════════════════
+function showScoreScreen() {
+  clearInterval(state.timerId);
+  state.screen = "score";
+  document.getElementById("gameScreen").style.display = "none";
+  document.getElementById("levelScreen").style.display = "none";
+  document.getElementById("scoreScreen").style.display = "";
+
+  const pct = (state.completed.length / LEVELS.length) * 100;
+  const stars = pct >= 100 ? "⭐⭐⭐" : pct >= 66 ? "⭐⭐" : "⭐";
+
+  document.getElementById("scoreScreen").innerHTML = `
+    <div class="score-screen">
+      <div class="big-emoji">🏆</div>
+      <h2>Mission Ordre — Terminée !</h2>
+      <div class="stars">${stars}</div>
+      <p>Tu connais maintenant <strong>D'abord, Ensuite, Puis, Finalement</strong> en français !</p>
+      <div class="score-detail">
+        <div class="score-stat"><div class="val">${state.totalScore}</div><div class="lbl">Points totaux</div></div>
+        <div class="score-stat"><div class="val">${state.completed.length}/${LEVELS.length}</div><div class="lbl">Niveaux complétés</div></div>
+      </div>
+      <div style="background:rgba(255,255,255,.12);border-radius:14px;padding:16px;margin-bottom:20px">
+        <div style="color:#F5C842;font-weight:700;margin-bottom:10px">📝 Les 4 mots à retenir :</div>
+        ${WORDS.map(w => `<div style="margin:6px 0"><span style="color:#F5C842;font-weight:800">${w.word}</span> ${w.emoji} → ${w.gesture}</div>`).join("")}
+      </div>
+      <div class="btn-row" style="justify-content:center">
+        <button class="btn btn-next" onclick="goMenu()">🎮 Rejouer</button>
+        <button class="btn btn-reset" onclick="resetAll()">🔄 Recommencer</button>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+renderLevelScreen();
+</script>
+</body>
+</html>
