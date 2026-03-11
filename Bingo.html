@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bingo - Jeu éducatif</title>
+  <style>
+    :root {
+      --bg: #f6fbff;
+      --panel: #ffffff;
+      --primary: #2b7fff;
+      --primary-dark: #1f5fc0;
+      --accent: #ffd54a;
+      --success: #34c759;
+      --danger: #ff5f57;
+      --text: #1f2937;
+      --muted: #5b6470;
+      --border: #d9e4f2;
+      --shadow: 0 8px 24px rgba(31, 41, 55, 0.10);
+      --cell-size: min(15vw, 90px);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, #eaf4ff 0%, #f6fbff 35%, #eef7ff 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      padding: 24px 20px 14px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: 1px;
+      color: var(--primary-dark);
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .top-bar {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1fr;
+      padding: 0 20px 20px;
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .status-box,
+    .rule-box,
+    .message-box {
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #f9fcff;
+    }
+
+    .status-label,
+    .rule-label {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .status-value {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--primary-dark);
+    }
+
+    .rule-text {
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .message-box {
+      text-align: center;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.35rem;
+      color: var(--primary-dark);
+      background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .message-box.bingo {
+      color: #0f7a2d;
+      background: linear-gradient(180deg, #f0fff4 0%, #dff9e7 100%);
+      border-color: #bde8ca;
+      animation: pulseBingo 0.9s ease-in-out 3;
+    }
+
+    @keyframes pulseBingo {
+      0%   { transform: scale(1); box-shadow: 0 0 0 rgba(52, 199, 89, 0); }
+      50%  { transform: scale(1.03); box-shadow: 0 0 22px rgba(52, 199, 89, 0.35); }
+      100% { transform: scale(1); box-shadow: 0 0 0 rgba(52, 199, 89, 0); }
+    }
+
+    .controls {
+      padding: 0 20px 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      appearance: none;
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+      box-shadow: 0 6px 14px rgba(31, 41, 55, 0.12);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #eef5ff;
+      color: var(--primary-dark);
+      border: 1px solid #d9e8ff;
+    }
+
+    .btn-tour {
+      background: #fff8df;
+      color: #7a5a00;
+      border: 1px solid #ffe08a;
+    }
+
+    .btn-tour.active {
+      background: var(--accent);
+      color: #5c4300;
+      box-shadow: 0 8px 16px rgba(255, 213, 74, 0.35);
+    }
+
+    .grid-wrap {
+      padding: 0 20px 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .bingo-grid {
+      display: grid;
+      grid-template-columns: repeat(5, var(--cell-size));
+      grid-template-rows: repeat(5, var(--cell-size));
+      gap: 10px;
+      justify-content: center;
+      align-content: center;
+    }
+
+    .cell {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      border-radius: 18px;
+      border: 2px solid #cfe0f5;
+      background: linear-gradient(180deg, #ffffff 0%, #f3f8ff 100%);
+      color: var(--text);
+      font-size: clamp(1.1rem, 3vw, 1.7rem);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      cursor: pointer;
+      transition:
+        transform 0.15s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .cell:hover {
+      transform: scale(1.03);
+      border-color: #9fc0ef;
+    }
+
+    .cell.marked {
+      background: linear-gradient(180deg, #dff7e6 0%, #c7f0d4 100%);
+      border-color: #6bc788;
+      color: #0b5d22;
+      box-shadow: 0 6px 16px rgba(52, 199, 89, 0.22);
+      animation: checkPop 0.18s ease-out;
+    }
+
+    @keyframes checkPop {
+      0%   { transform: scale(0.92); }
+      100% { transform: scale(1); }
+    }
+
+    .cell.winning {
+      outline: 4px solid #ffd54a;
+      outline-offset: 1px;
+      animation: winnerGlow 0.9s ease-in-out infinite alternate;
+    }
+
+    @keyframes winnerGlow {
+      from { box-shadow: 0 0 0 rgba(255, 213, 74, 0.15); }
+      to   { box-shadow: 0 0 20px rgba(255, 213, 74, 0.65); }
+    }
+
+    .footer-note {
+      text-align: center;
+      padding: 0 20px 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (min-width: 768px) {
+      .status-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .app {
+        padding: 12px;
+      }
+
+      .card {
+        border-radius: 16px;
+      }
+
+      .header {
+        padding: 18px 12px 10px;
+      }
+
+      .top-bar,
+      .controls,
+      .grid-wrap,
+      .footer-note {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .bingo-grid {
+        gap: 8px;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="card">
+      <div class="header">
+        <h1>BINGO</h1>
+        <p class="subtitle">Clique sur les nombres annoncés par l’enseignant.</p>
+      </div>
+
+      <div class="top-bar">
+        <div class="status-row">
+          <div class="status-box">
+            <div class="status-label">Tour actuel</div>
+            <div id="tourLabel" class="status-value">Tour 1 : Vertical</div>
+          </div>
+
+          <div class="rule-box">
+            <div class="rule-label">Règle du tour</div>
+            <div id="ruleText" class="rule-text">
+              Pour gagner, il faut compléter une colonne verticale.
+            </div>
+          </div>
+        </div>
+
+        <div id="messageBox" class="message-box" aria-live="polite">
+          Bonne chance !
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="button-group">
+          <button id="newCardBtn" class="btn-primary">Nouvelle carte</button>
+          <button id="resetBtn" class="btn-secondary">Réinitialiser les cases</button>
+        </div>
+
+        <div class="button-group">
+          <button class="btn-tour active" data-tour="1">Tour 1 : Vertical</button>
+          <button class="btn-tour" data-tour="2">Tour 2 : Horizontal</button>
+          <button class="btn-tour" data-tour="3">Tour 3 : Diagonales</button>
+          <button class="btn-tour" data-tour="4">Tour 4 : Toutes les directions</button>
+        </div>
+      </div>
+
+      <div class="grid-wrap">
+        <div id="bingoGrid" class="bingo-grid" role="grid" aria-label="Grille de Bingo"></div>
+      </div>
+
+      <div class="footer-note">
+        Chaque nouvelle carte génère 25 nombres uniques entre 1 et 50.
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /*
+      ============================
+      JEU DE BINGO - VERSION SIMPLE
+      ============================
+
+      Structure :
+      - Grille 5x5
+      - 25 nombres uniques entre 1 et 50
+      - Clic pour cocher / décocher
+      - Vérification automatique du Bingo selon le tour
+      - Tour 1 : colonnes
+      - Tour 2 : lignes
+      - Tour 3 : diagonales
+      - Tour 4 : lignes + colonnes + diagonales
+    */
+
+    const GRID_SIZE = 5;
+    const MIN_NUMBER = 1;
+    const MAX_NUMBER = 50;
+
+    let currentTour = 1;
+    let cardNumbers = [];     // Tableau de 25 nombres
+    let markedCells = [];     // Tableau de 25 booléens
+
+    const gridEl = document.getElementById("bingoGrid");
+    const messageBox = document.getElementById("messageBox");
+    const tourLabel = document.getElementById("tourLabel");
+    const ruleText = document.getElementById("ruleText");
+    const newCardBtn = document.getElementById("newCardBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const tourButtons = document.querySelectorAll(".btn-tour");
+
+    /**
+     * Mélange un tableau avec l'algorithme de Fisher-Yates.
+     * Cela permet une distribution aléatoire fiable des nombres.
+     */
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    /**
+     * Génère 25 nombres uniques entre 1 et 50.
+     * Vérification incluse pour garantir :
+     * - 25 valeurs
+     * - unicité
+     * - intervalle correct
+     */
+    function generateUniqueCard() {
+      const allNumbers = [];
+      for (let n = MIN_NUMBER; n <= MAX_NUMBER; n++) {
+        allNumbers.push(n);
+      }
+
+      const shuffled = shuffle(allNumbers);
+      const selected = shuffled.slice(0, GRID_SIZE * GRID_SIZE);
+
+      // Vérifications logiques demandées
+      const uniqueCount = new Set(selected).size;
+      const allInRange = selected.every(n => n >= MIN_NUMBER && n <= MAX_NUMBER);
+
+      if (selected.length !== 25 || uniqueCount !== 25 || !allInRange) {
+        throw new Error("Erreur de génération : la carte n'est pas valide.");
+      }
+
+      return selected;
+    }
+
+    /**
+     * Crée une nouvelle carte.
+     * Chaque ouverture ou clic sur "Nouvelle carte" produit une nouvelle combinaison.
+     */
+    function newCard() {
+      cardNumbers = generateUniqueCard();
+      markedCells = new Array(GRID_SIZE * GRID_SIZE).fill(false);
+      updateMessage("Bonne chance !");
+      renderGrid();
+    }
+
+    /**
+     * Réinitialise uniquement les cases cochées.
+     * La carte reste la même.
+     */
+    function resetMarks() {
+      markedCells = new Array(GRID_SIZE * GRID_SIZE).fill(false);
+      updateMessage("Les cases ont été réinitialisées.");
+      renderGrid();
+    }
+
+    /**
+     * Met à jour le texte du tour et la règle affichée.
+     */
+    function updateTourDisplay() {
+      const tourInfo = {
+        1: {
+          label: "Tour 1 : Vertical",
+          rule: "Pour gagner, il faut compléter une colonne verticale."
+        },
+        2: {
+          label: "Tour 2 : Horizontal",
+          rule: "Pour gagner, il faut compléter une ligne horizontale."
+        },
+        3: {
+          label: "Tour 3 : Diagonales",
+          rule: "Pour gagner, il faut compléter une diagonale."
+        },
+        4: {
+          label: "Tour 4 : Toutes les directions",
+          rule: "Pour gagner, il faut compléter une ligne, une colonne ou une diagonale."
+        }
+      };
+
+      tourLabel.textContent = tourInfo[currentTour].label;
+      ruleText.textContent = tourInfo[currentTour].rule;
+
+      tourButtons.forEach(btn => {
+        const isActive = Number(btn.dataset.tour) === currentTour;
+        btn.classList.toggle("active", isActive);
+      });
+    }
+
+    /**
+     * Met à jour la zone de message.
+     * Si bingo = true, active l'effet visuel.
+     */
+    function updateMessage(text, bingo = false) {
+      messageBox.textContent = text;
+      messageBox.classList.toggle("bingo", bingo);
+    }
+
+    /**
+     * Convertit un index linéaire en [ligne, colonne].
+     */
+    function indexToRowCol(index) {
+      const row = Math.floor(index / GRID_SIZE);
+      const col = index % GRID_SIZE;
+      return [row, col];
+    }
+
+    /**
+     * Convertit [ligne, colonne] en index linéaire.
+     */
+    function rowColToIndex(row, col) {
+      return row * GRID_SIZE + col;
+    }
+
+    /**
+     * Retourne toutes les combinaisons gagnantes possibles
+     * selon le tour actif.
+     *
+     * Chaque combinaison est un tableau d'index.
+     */
+    function getWinningPatternsForCurrentTour() {
+      const rows = [];
+      const cols = [];
+      const diagonals = [];
+
+      // Lignes horizontales
+      for (let row = 0; row < GRID_SIZE; row++) {
+        const pattern = [];
+        for (let col = 0; col < GRID_SIZE; col++) {
+          pattern.push(rowColToIndex(row, col));
+        }
+        rows.push(pattern);
+      }
+
+      // Colonnes verticales
+      for (let col = 0; col < GRID_SIZE; col++) {
+        const pattern = [];
+        for (let row = 0; row < GRID_SIZE; row++) {
+          pattern.push(rowColToIndex(row, col));
+        }
+        cols.push(pattern);
+      }
+
+      // Diagonale principale
+      const diag1 = [];
+      for (let i = 0; i < GRID_SIZE; i++) {
+        diag1.push(rowColToIndex(i, i));
+      }
+
+      // Diagonale secondaire
+      const diag2 = [];
+      for (let i = 0; i < GRID_SIZE; i++) {
+        diag2.push(rowColToIndex(i, GRID_SIZE - 1 - i));
+      }
+
+      diagonals.push(diag1, diag2);
+
+      switch (currentTour) {
+        case 1:
+          return cols;
+        case 2:
+          return rows;
+        case 3:
+          return diagonals;
+        case 4:
+          return [...rows, ...cols, ...diagonals];
+        default:
+          return [];
+      }
+    }
+
+    /**
+     * Vérifie s'il y a Bingo selon le tour actif.
+     * Retourne l'une des combinaisons gagnantes si trouvée.
+     * Retourne null sinon.
+     *
+     * Cela évite les faux positifs.
+     */
+    function checkBingo() {
+      const patterns = getWinningPatternsForCurrentTour();
+
+      for (const pattern of patterns) {
+        const isWinning = pattern.every(index => markedCells[index] === true);
+        if (isWinning) {
+          return pattern;
+        }
+      }
+
+      return null;
+    }
+
+    /**
+     * Gère le clic sur une case :
+     * - coche / décoche
+     * - relance la vérification Bingo
+     */
+    function toggleCell(index) {
+      markedCells[index] = !markedCells[index];
+
+      const winningPattern = checkBingo();
+
+      renderGrid(winningPattern);
+
+      if (winningPattern) {
+        updateMessage("BINGO !", true);
+      } else {
+        updateMessage("Continue !");
+      }
+    }
+
+    /**
+     * Construit visuellement la grille.
+     * Si un pattern gagnant est fourni, on le met en évidence.
+     */
+    function renderGrid(winningPattern = null) {
+      gridEl.innerHTML = "";
+
+      cardNumbers.forEach((number, index) => {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "cell";
+        cell.setAttribute("role", "gridcell");
+        cell.setAttribute("aria-label", `Nombre ${number}`);
+        cell.textContent = number;
+
+        if (markedCells[index]) {
+          cell.classList.add("marked");
+          cell.setAttribute("aria-pressed", "true");
+        } else {
+          cell.setAttribute("aria-pressed", "false");
+        }
+
+        if (winningPattern && winningPattern.includes(index)) {
+          cell.classList.add("winning");
+        }
+
+        cell.addEventListener("click", () => toggleCell(index));
+        gridEl.appendChild(cell);
+      });
+    }
+
+    /**
+     * Change de tour puis vérifie à nouveau l'état actuel de la carte.
+     * Cela permet d'appliquer immédiatement la bonne règle.
+     */
+    function setTour(tourNumber) {
+      currentTour = tourNumber;
+      updateTourDisplay();
+
+      const winningPattern = checkBingo();
+      renderGrid(winningPattern);
+
+      if (winningPattern) {
+        updateMessage("BINGO !", true);
+      } else {
+        updateMessage("Tour changé. Continue !");
+      }
+    }
+
+    /**
+     * Initialisation de l'application.
+     */
+    function init() {
+      updateTourDisplay();
+      newCard();
+
+      newCardBtn.addEventListener("click", newCard);
+      resetBtn.addEventListener("click", resetMarks);
+
+      tourButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const selectedTour = Number(btn.dataset.tour);
+          setTour(selectedTour);
+        });
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
